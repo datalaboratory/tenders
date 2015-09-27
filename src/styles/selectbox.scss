@@ -1,0 +1,68 @@
+@import 'variables';
+
+.mad-selectbox {
+  min-width: 200px;
+  font-family: $helvetica-neue-light;
+  font-size: $common-font-size;
+
+  .mad-selectbox-toggle {
+    height: auto;
+  }
+
+  .mad-selectbox-toggle::after {
+    top: 13px;
+    right: 10px;
+    border-top: 4px solid #333;
+    border-right: 4px solid transparent;
+    border-bottom: none;
+    border-left: 4px solid transparent;
+  }
+
+  .mad-selectbox-toggle.active::after {
+    top: 13px;
+    right: 10px;
+    border-top: none;
+    border-right: 4px solid transparent;
+    border-bottom: 4px solid #333;
+    border-left: 4px solid transparent;
+  }
+
+  .mad-selectbox-dropdown {
+    top: 33px;
+    max-height: 232px;
+
+    li {
+      .mad-selectbox-item {
+        height: auto;
+      }
+    }
+
+    li:not(:last-child) {
+      border-color: $thin-line-color;
+    }
+
+    li.active {
+      .mad-selectbox-item {
+        background-color: $selectbox-active-color;
+      }
+    }
+
+    li.active:hover {
+      .mad-selectbox-item {
+        background-color: $selectbox-active-color;
+      }
+    }
+
+    li:hover {
+      .mad-selectbox-item {
+        background-color: $selectbox-hover-color;
+      }
+    }
+
+    li:focus {
+      .mad-selectbox-item {
+        background-color: $selectbox-hover-color;
+      }
+    }
+  }
+}
