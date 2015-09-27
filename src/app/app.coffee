@@ -1,5 +1,6 @@
 appDependencies = [
   'ngRoute'
+  'selectbox'
 ]
 
 app = angular.module 'app', appDependencies
@@ -8,8 +9,8 @@ app = angular.module 'app', appDependencies
   ($routeProvider, $locationProvider) ->
     $routeProvider
     .when '/',
-      templateUrl: ''
-      controller: ''
+      templateUrl: 'templates/pages/main.html'
+      controller: 'mainCtrl'
     .otherwise redirectTo: '/'
     return
 ]

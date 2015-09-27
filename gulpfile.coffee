@@ -14,7 +14,7 @@ sources =
   scripts: 'src/app/**/*.coffee'
   templates: 'src/templates/**/*.html'
   index: 'src/index.html'
-  favicon: 'src/img/favicon.png'
+  favicon: 'src/img/favicon.ico'
   img: 'src/img/**/*.png'
   data: 'src/data/**/*.csv'
   fonts: 'src/fonts/**'
@@ -38,9 +38,11 @@ vendors =
     'bower_components/queue-async/queue.js'
     'bower_components/lodash/lodash.js'
     'external_libs/ilya-birman-likely-2.0/likely.js'
+    'external_libs/angular-selectbox/angular-selectbox.js'
   ]
   styles: [
     'external_libs/ilya-birman-likely-2.0/likely.css'
+    'external_libs/angular-selectbox/angular-selectbox.css'
   ]
 
 # Tasks

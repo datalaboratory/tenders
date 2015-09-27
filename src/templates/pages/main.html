@@ -1,0 +1,11 @@
+<loading-cover
+	data-ng-if="!isDataPrepared">
+</loading-cover>
+<div
+	class="main"
+	data-ng-if="isDataPrepared">
+	<selectbox
+		data-list="model.list"
+		data-ng-model="model.selected">
+	</selectbox>
+</div>
