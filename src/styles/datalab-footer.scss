@@ -1,0 +1,31 @@
+@import 'variables';
+
+.datalab-footer {
+  margin: 20px 0 0 $common-margin-left;
+  width: 1000px;
+
+  .typical-info {
+    font-family: $helvetica-neue-light;
+    font-size: $small-font-size;
+
+    .viz-caption {
+      display: inline-block;
+
+      .datalab-caption {
+        font-family: $garamond-original-italic;
+        font-size: $datalab-font-size;
+      }
+    }
+
+    .additional-info {
+      display: inline-block;
+      margin: 0 0 0 50px;
+    }
+
+    .likely {
+      display: inline-block;
+      float: right;
+      font-size: $small-font-size;
+    }
+  }
+}

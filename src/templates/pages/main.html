@@ -1,11 +1,11 @@
-<loading-cover
-	data-ng-if="!isDataPrepared">
-</loading-cover>
 <div
-	class="main"
+	class="main-container"
 	data-ng-if="isDataPrepared">
-	<selectbox
-		data-list="model.list"
-		data-ng-model="model.selected">
-	</selectbox>
+	<div class="header-container">Тендеры в {{model.region}} за {{model.date}}</div>
+	<div class="filters-container"></div>
+	<div class="bar-chart-container"></div>
+	<div class="map-container"></div>
+	<div class="footer-container">
+		<datalab-footer></datalab-footer>
+	</div>
 </div>

@@ -19,8 +19,8 @@ app.controller 'mainCtrl', ($scope) ->
   $scope.isDataPrepared = false
 
   $scope.model =
-    list: ['Манчестер Юнайтед', 'Челси', 'Арсенал', 'Ливерпуль', 'Манчестер Сити', 'Тоттенхэм', 'Эвертон']
-    selected: 0
+    region: 'РФ'
+    date: '2015 год'
 
   # Parse data
   parseData = (error, rawData) ->
@@ -28,6 +28,7 @@ app.controller 'mainCtrl', ($scope) ->
       console.log error
 
     $scope.isDataPrepared = true
+    $('.loading-cover').hide()
 
     $scope.$apply()
     return
