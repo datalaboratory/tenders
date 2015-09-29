@@ -1,0 +1,21 @@
+<div class="map">
+  <svg>
+    <g class="regions">
+      <path
+        class="region"
+        data-ng-repeat="region in regions"
+        data-ng-attr-d="{{getRegionPath(region)}}"
+        data-ng-style="getRegionStyle(region)">
+      </path>
+    </g>
+    <g class="cities">
+      <g
+        class="city"
+        data-ng-repeat="city in citiesData"
+        data-ng-attr-transform="{{'translate(' + getCityCoordinates(city) + ')'}}">
+        <circle r="1"></circle>
+        <text x="3" y="-3">{{city.City}}</text>
+      </g>
+    </g>
+  </svg>
+</div>

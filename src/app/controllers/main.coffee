@@ -1,41 +1,59 @@
 app.controller 'mainCtrl', ($scope) ->
+  dsv = d3.dsv ';', 'text/plain'
+
   $scope.monthNames = [
-    ['янв', 'янв'],
-    ['фев', 'фев'],
-    ['мар', 'мар'],
-    ['апр', 'апр'],
-    ['май', 'мая'],
-    ['июнь', 'июня'],
-    ['июль', 'июля'],
-    ['авг', 'авг'],
-    ['сен', 'сен'],
-    ['окт', 'окт'],
-    ['ноя', 'ноя'],
-    ['дек', 'дек']
+    ['январь', 'янв'],
+    ['февраль', 'фев'],
+    ['март', 'мар'],
+    ['апрель', 'апр'],
+    ['май', 'май'],
+    ['июнь', 'июнь'],
+    ['июль', 'июль'],
+    ['август', 'авг'],
+    ['сентябрь', 'сен'],
+    ['октябрь', 'окт'],
+    ['ноябрь', 'ноя'],
+    ['декабрь', 'дек']
   ]
 
-  $scope.data = []
+  $scope.mapData = {}
+  $scope.citiesData = []
+
+  $scope.model =
+    region: 'Все регионы'
+    month: ''
 
   $scope.isDataPrepared = false
 
-  $scope.model =
-    region: 'РФ'
-    date: '2015 год'
-
-  # Parse data
-  parseData = (error, rawData) ->
+  # Parse main data
+  parseMainData = (error, rawData) ->
     if error
       console.log error
 
+    # Load map data
+    queue()
+    .defer d3.json, '../data/map/russia.json'
+    .defer d3.tsv, '../data/map/cities.tsv'
+    .awaitAll parseMapData
+    return
+
+  # Parse map data
+  parseMapData = (error, rawData) ->
+    if error
+      console.log error
+
+    $scope.mapData = rawData[0]
+    $scope.citiesData = rawData[1]
+
     $scope.isDataPrepared = true
-    $('.loading-cover').hide()
+    $('.loading-cover').fadeOut()
 
     $scope.$apply()
     return
 
-  # Load data
+  # Load main data
   queue()
-  .defer d3.csv, '../data/newbicotender_table_tender.csv'
-  .awaitAll parseData
+  .defer dsv, '../data/tenders/newbicotender_table_tender.csv'
+  .awaitAll parseMainData
 
   return

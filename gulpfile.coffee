@@ -16,7 +16,7 @@ sources =
   index: 'src/index.html'
   favicon: 'src/img/favicon.ico'
   img: 'src/img/**/*.png'
-  data: 'src/data/**/*.csv'
+  data: 'src/data/**/*'
   fonts: 'src/fonts/**'
 
 destinations =
@@ -36,6 +36,7 @@ vendors =
     'bower_components/angular-route/angular-route.js'
     'bower_components/d3/d3.js'
     'bower_components/queue-async/queue.js'
+    'bower_components/topojson/topojson.js'
     'bower_components/lodash/lodash.js'
     'external_libs/ilya-birman-likely-2.0/likely.js'
     'external_libs/angular-selectbox/angular-selectbox.js'

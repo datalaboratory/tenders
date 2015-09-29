@@ -1,8 +1,12 @@
 <div
 	class="main-container"
 	data-ng-if="isDataPrepared">
-	<div class="header-container">Тендеры в {{model.region}} за {{model.date}}</div>
+	<div class="header-container">Тендеры в {{model.region === 'Все регионы' ? 'РФ' : model.region}} за {{model.month ? model.month + ' 2015 года' : '2015 год'}}</div>
 	<div class="filters-container"></div>
 	<div class="bar-chart-container"></div>
-	<div class="map-container"></div>
+	<div class="map-container">
+		<map
+			data-map-data="mapData"
+			data-cities-data="citiesData"></map>
+	</div>
 </div>
