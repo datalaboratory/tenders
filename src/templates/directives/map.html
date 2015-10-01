@@ -13,10 +13,7 @@
       data-ng-repeat="city in citiesData"
       data-ng-attr-transform="{{'translate(' + getCityCoordinates(city) + ')'}}">
       <circle r="1"></circle>
-      <text
-        x="3"
-        y="-3"
-        data-ng-bind="city.City"></text>
+      <text x="3" y="-3">{{city.City}}</text>
     </g>
   </g>
 </svg>
