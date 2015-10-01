@@ -25,10 +25,28 @@ app.controller 'mainCtrl', ($scope) ->
 
   $scope.isDataPrepared = false
 
+  tenderStatuses = {}
+  tenderTypes = {}
+
   # Parse main data
   parseMainData = (error, rawData) ->
     if error
       console.log error
+
+    # Tender statuses
+    rawData[10].forEach (d) ->
+      tenderStatuses[d.status_id] =
+        caption: d.caption
+        name: d.name
+      return
+
+    # Tender types
+    rawData[11].forEach (d) ->
+      tenderTypes[d.type_id] =
+        caption: d.caption
+        name: d.name
+        plural: d.plural
+      return
 
     # Load map data
     queue()
@@ -53,7 +71,18 @@ app.controller 'mainCtrl', ($scope) ->
 
   # Load main data
   queue()
+  .defer dsv, '../data/tenders/newbicotender_table_company.csv'
+  .defer dsv, '../data/tenders/newbicotender_table_tenderCompetitor.csv'
   .defer dsv, '../data/tenders/newbicotender_table_tender.csv'
+  .defer dsv, '../data/tenders/newbicotender_table_tenderLot.csv'
+  .defer dsv, '../data/tenders/newbicotender_table_tenderPosition.csv'
+  .defer dsv, '../data/tenders/shared_table_region.csv'
+  .defer dsv, '../data/tenders/newbicotender_table_tender_appliesIn_region.csv'
+  .defer dsv, '../data/tenders/shared_table_field.csv'
+  .defer dsv, '../data/tenders/newbicotender_table_tender_in_field.csv'
+  .defer dsv, '../data/tenders/newbicotender_table_tenderDuplicate.csv'
+  .defer dsv, '../data/tenders/newbicotender_table_tenderStatus.csv'
+  .defer dsv, '../data/tenders/newbicotender_table_tenderType.csv'
   .awaitAll parseMainData
 
   return

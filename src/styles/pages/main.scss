@@ -2,14 +2,13 @@
 
 .main-container {
 	.header-container {
-		margin: 20px 0 0 $common-margin-left;
+		margin: 20px $common-margin 0 $common-margin;
 		font-family: $helvetica-neue-medium;
 		font-size: $header-font-size;
 	}
 
 	.map-container {
-		margin: 20px 0 0 $common-margin-left;
-		width: 950px;
-		height: 500px;
+		margin: 20px $common-margin 0 $common-margin;
+		width: calc(50% - 10px - #{$common-margin});
 	}
 }
