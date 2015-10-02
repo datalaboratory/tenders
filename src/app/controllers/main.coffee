@@ -16,6 +16,33 @@ app.controller 'mainCtrl', ($scope) ->
     ['декабрь', 'дек']
   ]
 
+  $scope.fieldColors = [
+    '#9cd994',
+    '#ecb1d1',
+    '#e7ab74',
+    '#a8ecf2',
+    '#ded374',
+    '#d7beb1',
+    '#c5c5f1',
+    '#bdeeca',
+    '#f1e3a7',
+    '#f0a8a1',
+    '#e7ebdf',
+    '#7de0b8',
+    '#bdc69d',
+    '#8ec2d7',
+    '#d5ed88',
+    '#d5c3d6',
+    '#ddbd93',
+    '#aecfc6',
+    '#b8be74',
+    '#92c6a5',
+    '#7cddd5',
+    '#d0f0ab',
+    '#e4bd6a',
+    '#c0d5eb'
+  ]
+
   $scope.mapData = {}
   $scope.citiesData = []
 

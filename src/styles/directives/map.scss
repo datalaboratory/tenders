@@ -2,13 +2,9 @@
 
 .map {
   .city {
-    circle {
-      fill: #333;
-    }
-
     text {
       font-family: $helvetica-neue-light;
-      font-size: $small-font-size;
+      font-size: $map-font-size;
       cursor: default;
     }
   }

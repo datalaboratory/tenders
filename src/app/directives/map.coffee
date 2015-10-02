@@ -1,10 +1,10 @@
 app.directive 'map', ->
   restrict: 'E'
   templateNamespace: 'svg'
-  templateUrl: 'templates/directives/map.html'
   scope:
     mapData: '='
     citiesData: '='
+    fieldColors: '='
   link: ($scope, $element, $attrs) ->
     element = $element[0]
     d3element = d3.select element
@@ -14,10 +14,6 @@ app.directive 'map', ->
     projectionScale = 700
     containerScale = $element.parent().width() / width
 
-    map = d3element.select '.map'
-
-    map.attr('width', width * containerScale).attr('height', height * containerScale)
-
     projection = d3.geo.albers()
     .rotate [-105, 0]
     .center [-10, 65]
@@ -25,22 +21,52 @@ app.directive 'map', ->
     .scale projectionScale * containerScale
     .translate [width * containerScale / 2, height * containerScale / 2]
 
-    $scope.regions = topojson.feature($scope.mapData, $scope.mapData.objects.russia).features
+    path = d3.geo.path().projection projection
 
-    $scope.getRegionPath = d3.geo.path().projection projection
+    svg = d3element.append 'svg'
+    .classed 'map', true
+    .attr 'width', width * containerScale
+    .attr 'height', height * containerScale
 
-    $scope.getRegionStyle = (region) ->
-      fill: '#333'
-      opacity: .5
+    regionCodes = _.uniq(_.pluck(topojson.feature($scope.mapData, $scope.mapData.objects.russia).features, 'properties.region'))
 
-    $scope.getCityCoordinates = (city) ->
-      projection [city.lon, city.lat]
+    regions = svg.append 'g'
+    .classed 'regions', true
+    .selectAll 'path'
+    .data topojson.feature($scope.mapData, $scope.mapData.objects.russia).features
+    .enter()
+    .append 'path'
+    .classed 'region', true
+    .attr 'd', path
+    .attr 'id', (d) -> d.properties.region
+    .style 'fill', (d) -> $scope.fieldColors[_.indexOf(regionCodes, d.properties.region) % 24]
+    .style 'opacity', 1
+
+    cities = svg.append 'g'
+    .classed 'cities', true
+    .selectAll 'g'
+    .data $scope.citiesData
+    .enter()
+    .append 'g'
+    .classed 'city', true
+    .attr 'transform', (d) -> 'translate(' + projection([d.lon, d.lat]) + ')'
+
+    cities.append 'circle'
+    .attr 'r', 1.5
+    .style 'fill', '#555'
+
+    cities.append 'text'
+    .attr 'x', 2
+    .attr 'y', -1
+    .text (d) -> d.City
+    .style 'fill', '#555'
 
     $(window).on 'resize', ->
       containerScale = $element.parent().width() / width
-      map.attr('width', width * containerScale).attr('height', height * containerScale)
+      svg.attr('width', width * containerScale).attr('height', height * containerScale)
       projection.scale(projectionScale * containerScale).translate([width * containerScale / 2, height * containerScale / 2])
-      $scope.$apply()
+      regions.attr 'd', path
+      cities.attr 'transform', (d) -> 'translate(' + projection([d.lon, d.lat]) + ')'
       return
 
     return
