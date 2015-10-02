@@ -46,34 +46,28 @@ app.controller 'mainCtrl', ($scope) ->
   $scope.mapData = {}
   $scope.citiesData = []
 
-  $scope.model =
-    region: 'Все регионы'
-    month: ''
-
   $scope.isDataPrepared = false
 
-  tenderStatuses = {}
-  tenderTypes = {}
+  tenderStatuses = []
+  tenderTypes = []
 
   # Parse main data
   parseMainData = (error, rawData) ->
     if error
       console.log error
 
-    # Tender statuses
-    rawData[10].forEach (d) ->
-      tenderStatuses[d.status_id] =
-        caption: d.caption
-        name: d.name
-      return
+    # Parse data
+    tenderStatuses = rawData[10]
+    tenderTypes = rawData[11]
 
-    # Tender types
-    rawData[11].forEach (d) ->
-      tenderTypes[d.type_id] =
-        caption: d.caption
-        name: d.name
-        plural: d.plural
-      return
+    # Create filters
+    $scope.filtersDatasets =
+      tenderType: ['Все типы'].concat(_.pluck(tenderTypes, 'caption'))
+      tenderStatus: ['Все статусы'].concat(_.pluck(tenderStatuses, 'caption'))
+
+    $scope.model =
+      tenderType: 0
+      tenderStatus: 0
 
     # Load map data
     queue()

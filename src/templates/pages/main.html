@@ -1,8 +1,16 @@
 <div
 	class="main-container"
 	data-ng-if="isDataPrepared">
-	<div class="header-container">Тендеры в {{model.region === 'Все регионы' ? 'РФ' : model.region}} за {{model.month ? model.month + ' 2015 года' : '2015 год'}}</div>
-	<div class="filters-container"></div>
+	<div class="header-container">Тендеры в РФ за год</div>
+	<div class="filters-container">
+		<selectbox
+			data-list="filtersDatasets.tenderType"
+			data-ng-model="model.tenderType"></selectbox>
+		<selectbox
+			data-list="filtersDatasets.tenderStatus"
+			data-ng-model="model.tenderStatus"></selectbox>
+		<br class="clear-both" />
+	</div>
 	<div class="bar-chart-container"></div>
 	<div class="map-container">
 		<map

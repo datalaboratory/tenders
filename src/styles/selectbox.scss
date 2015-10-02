@@ -1,9 +1,15 @@
 @import 'variables';
 
 .mad-selectbox {
-  min-width: 200px;
+  width: 200px;
   font-family: $helvetica-neue-light;
   font-size: $common-font-size;
+
+  a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 
   .mad-selectbox-toggle {
     height: auto;

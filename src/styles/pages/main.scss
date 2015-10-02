@@ -7,6 +7,18 @@
 		font-size: $header-font-size;
 	}
 
+	.filters-container {
+		margin: 20px $common-margin 0 $common-margin;
+
+		.mad-selectbox {
+			float: left;
+		}
+
+		.mad-selectbox:not(:first-child) {
+			margin-left: $filters-gap;
+		}
+	}
+
 	.map-container {
 		margin: 20px $common-margin 0 $common-margin;
 		width: calc(60% - 10px - #{$common-margin});
