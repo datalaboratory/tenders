@@ -60,6 +60,7 @@ app.directive 'map', ->
     .attr 'y', -1
     .text (d) -> d.City
     .style 'fill', '#555'
+    .style 'font-size', Math.round(12 * containerScale) + 'px'
 
     $(window).on 'resize', ->
       containerScale = $element.parent().width() / width
@@ -67,6 +68,7 @@ app.directive 'map', ->
       projection.scale(projectionScale * containerScale).translate([width * containerScale / 2, height * containerScale / 2])
       regions.attr 'd', path
       cities.attr 'transform', (d) -> 'translate(' + projection([d.lon, d.lat]) + ')'
+      cities.selectAll('text').style('font-size', Math.round(12 * containerScale) + 'px')
       return
 
     return
