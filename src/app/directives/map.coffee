@@ -5,6 +5,7 @@ app.directive 'map', ->
     mapData: '='
     citiesData: '='
     fieldColors: '='
+    duration: '='
   link: ($scope, $element, $attrs) ->
     element = $element[0]
     d3element = d3.select element
@@ -62,13 +63,26 @@ app.directive 'map', ->
     .style 'fill', '#555'
     .style 'font-size', if containerScale > 1 then '12px' else '10px'
 
-    $(window).on 'resize', ->
+    $scope.$on 'render', ($event) ->
       containerScale = $element.parent().width() / width
-      svg.attr('width', width * containerScale).attr('height', height * containerScale)
+
+      svg.transition()
+      .duration $scope.duration
+      .attr 'width', width * containerScale
+      .attr 'height', height * containerScale
+
       projection.scale(projectionScale * containerScale).translate([width * containerScale / 2, height * containerScale / 2])
-      regions.attr 'd', path
-      cities.attr 'transform', (d) -> 'translate(' + projection([d.lon, d.lat]) + ')'
-      cities.selectAll('text').style('font-size', if containerScale > 1 then '12px' else '10px')
+
+      regions.transition()
+      .duration $scope.duration
+      .attr 'd', path
+
+      cities.transition()
+      .duration $scope.duration
+      .attr 'transform', (d) -> 'translate(' + projection([d.lon, d.lat]) + ')'
+
+      cities.selectAll 'text'
+      .style 'font-size', if containerScale > 1 then '12px' else '10px'
       return
 
     return

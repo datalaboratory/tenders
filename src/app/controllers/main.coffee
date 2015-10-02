@@ -43,6 +43,8 @@ app.controller 'mainCtrl', ($scope) ->
     '#c0d5eb'
   ]
 
+  $scope.duration = 500
+
   $scope.mapData = {}
   $scope.citiesData = []
 
@@ -105,5 +107,9 @@ app.controller 'mainCtrl', ($scope) ->
   .defer dsv, '../data/tenders/newbicotender_table_tenderStatus.csv'
   .defer dsv, '../data/tenders/newbicotender_table_tenderType.csv'
   .awaitAll parseMainData
+
+  $(window).on 'resize', ->
+    $scope.$broadcast 'render'
+    return
 
   return
