@@ -21,6 +21,7 @@ app.controller 'mainCtrl', ($scope) ->
   $scope.duration = 500
 
   $scope.tenders = []
+  $scope.fieldColors = {}
   $scope.mapData = {}
   $scope.citiesData = []
 
@@ -35,7 +36,6 @@ app.controller 'mainCtrl', ($scope) ->
     fields = {}
     companies = {}
     tenderTypes = {}
-    colors = {}
     codes = {}
 
     # Regions
@@ -71,7 +71,7 @@ app.controller 'mainCtrl', ($scope) ->
 
     # Colors
     rawData[5].forEach (rD) ->
-      colors[rD['field']] = rD['color']
+      $scope.fieldColors[rD['field']] = rD['color']
       return
 
     # Tenders
@@ -83,7 +83,6 @@ app.controller 'mainCtrl', ($scope) ->
       date = moment(rD['startDate'], dateFormat).toDate()
       customer = companies[rD['company_id']]
       field = fields[fields[rD['field_id']]['root']]['name']
-      color = colors[fields[fields[rD['field_id']]['root']]['name']]
       regionObject = regions[regions[rD['region_id']]['path'].split(',')[2]]
       region = (if regionObject then regionObject['name'] else '').trim()
       code = codes[region]
@@ -96,7 +95,6 @@ app.controller 'mainCtrl', ($scope) ->
         date: date
         customer: customer
         field: field
-        color: color
         region: region
         code: code
       return

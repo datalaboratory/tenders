@@ -4,6 +4,8 @@ app.directive 'map', ->
   scope:
     mapData: '='
     citiesData: '='
+    tenders: '='
+    fieldColors: '='
     duration: '='
   link: ($scope, $element, $attrs) ->
     element = $element[0]
@@ -23,6 +25,25 @@ app.directive 'map', ->
 
     path = d3.geo.path().projection projection
 
+    getRegionColor = (region) ->
+      regionTenders = $scope.tenders.filter (t) -> t.code is region.properties.region
+
+      if regionTenders.length
+        regionFields = []
+
+        _.uniq(_.pluck(regionTenders, 'field')).forEach (d) ->
+          fieldTenders = regionTenders.filter (rT) -> rT.field is d
+          regionFields.push
+            name: d
+            overall: d3.sum _.pluck fieldTenders, 'price'
+          return
+
+        $scope.fieldColors[_.max(regionFields, 'overall').name]
+      else
+        '#e6e6e6'
+
+
+
     svg = d3element.append 'svg'
     .classed 'map', true
     .attr 'width', width * containerScale
@@ -37,7 +58,7 @@ app.directive 'map', ->
     .classed 'region', true
     .attr 'd', path
     .attr 'id', (d) -> d.properties.region
-    .style 'fill', (d) -> '#9cd994'
+    .style 'fill', getRegionColor
     .style 'opacity', 1
 
     cities = svg.append 'g'
