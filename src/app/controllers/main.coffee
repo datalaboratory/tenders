@@ -1,6 +1,8 @@
 app.controller 'mainCtrl', ($scope) ->
   dsv = d3.dsv ';', 'text/plain'
 
+  dateFormat = 'YYYY-MM-DD'
+
   $scope.monthNames = [
     ['январь', 'янв'],
     ['февраль', 'фев'],
@@ -16,60 +18,96 @@ app.controller 'mainCtrl', ($scope) ->
     ['декабрь', 'дек']
   ]
 
-  $scope.fieldColors = [
-    '#9cd994',
-    '#ecb1d1',
-    '#e7ab74',
-    '#a8ecf2',
-    '#ded374',
-    '#d7beb1',
-    '#c5c5f1',
-    '#bdeeca',
-    '#f1e3a7',
-    '#f0a8a1',
-    '#e7ebdf',
-    '#7de0b8',
-    '#bdc69d',
-    '#8ec2d7',
-    '#d5ed88',
-    '#d5c3d6',
-    '#ddbd93',
-    '#aecfc6',
-    '#b8be74',
-    '#92c6a5',
-    '#7cddd5',
-    '#d0f0ab',
-    '#e4bd6a',
-    '#c0d5eb'
-  ]
-
   $scope.duration = 500
 
+  $scope.tenders = []
   $scope.mapData = {}
   $scope.citiesData = []
 
   $scope.isDataPrepared = false
-
-  tenderStatuses = []
-  tenderTypes = []
 
   # Parse main data
   parseMainData = (error, rawData) ->
     if error
       console.log error
 
-    # Parse data
-    tenderStatuses = rawData[10]
-    tenderTypes = rawData[11]
+    regions = {}
+    fields = {}
+    companies = {}
+    tenderTypes = {}
+    colors = {}
+    codes = {}
 
-    # Create filters
-    $scope.filtersDatasets =
-      tenderType: ['Все типы'].concat(_.pluck(tenderTypes, 'caption'))
-      tenderStatus: ['Все статусы'].concat(_.pluck(tenderStatuses, 'caption'))
+    # Regions
+    rawData[0].forEach (rD) ->
+      regions[rD['region_id']] =
+        root: rD['first_parent_id']
+        name: rD['name']
+        level: rD['nestedLevel']
+        path: rD['pathToRoot']
+      return
 
-    $scope.model =
-      tenderType: 0
-      tenderStatus: 0
+    # Fields
+    rawData[1].forEach (rD) ->
+      fields[rD['field_id']] =
+        root: rD['first_parent_id']
+        name: rD['name']
+      return
+
+    # Companies
+    rawData[2].forEach (rD) ->
+      companies[rD['company_id']] = if rD['shortName'] is 'NULL' then rD['name'] else rD['shortName']
+      return
+
+    # Tender types
+    rawData[3].forEach (rD) ->
+      tenderTypes[rD['type_id']] = rD['caption']
+      return
+
+    # Codes
+    rawData[4].forEach (rD) ->
+      codes[rD['name']] = rD['code']
+      return
+
+    # Colors
+    rawData[5].forEach (rD) ->
+      colors[rD['field']] = rD['color']
+      return
+
+    # Tenders
+    rawData[6].forEach (rD) ->
+      id = rD['tender_id']
+      name = rD['name']
+      type = tenderTypes[rD['type_id']]
+      price = parseInt rD['cost']
+      date = moment(rD['startDate'], dateFormat).toDate()
+      customer = companies[rD['company_id']]
+      field = fields[fields[rD['field_id']]['root']]['name']
+      color = colors[fields[fields[rD['field_id']]['root']]['name']]
+      regionObject = regions[regions[rD['region_id']]['path'].split(',')[2]]
+      region = (if regionObject then regionObject['name'] else '').trim()
+      code = codes[region]
+
+      $scope.tenders.push
+        id: id
+        name: name
+        type: type
+        price: price
+        date: date
+        customer: customer
+        field: field
+        color: color
+        region: region
+        code: code
+      return
+
+    # Filter tenders by date
+    $scope.tenders.sort (a, b) -> a.date - b.date
+
+    startDate = moment('2014-07-31', dateFormat).toDate()
+    endDate = moment('2015-08-01', dateFormat).toDate()
+
+    $scope.tenders = $scope.tenders.filter (t) -> startDate < t.date < endDate
 
     # Load map data
     queue()
@@ -94,18 +132,13 @@ app.controller 'mainCtrl', ($scope) ->
 
   # Load main data
   queue()
-  .defer dsv, '../data/tenders/newbicotender_table_company.csv'
-  .defer dsv, '../data/tenders/newbicotender_table_tenderCompetitor.csv'
-  .defer dsv, '../data/tenders/newbicotender_table_tender.csv'
-  .defer dsv, '../data/tenders/newbicotender_table_tenderLot.csv'
-  .defer dsv, '../data/tenders/newbicotender_table_tenderPosition.csv'
   .defer dsv, '../data/tenders/shared_table_region.csv'
-  .defer dsv, '../data/tenders/newbicotender_table_tender_appliesIn_region.csv'
   .defer dsv, '../data/tenders/shared_table_field.csv'
-  .defer dsv, '../data/tenders/newbicotender_table_tender_in_field.csv'
-  .defer dsv, '../data/tenders/newbicotender_table_tenderDuplicate.csv'
-  .defer dsv, '../data/tenders/newbicotender_table_tenderStatus.csv'
+  .defer dsv, '../data/tenders/newbicotender_table_company.csv'
   .defer dsv, '../data/tenders/newbicotender_table_tenderType.csv'
+  .defer d3.csv, '../data/accessories/region-codes.csv'
+  .defer d3.csv, '../data/accessories/field-colors.csv'
+  .defer dsv, '../data/tenders/newbicotender_table_tender.csv'
   .awaitAll parseMainData
 
   $(window).on 'resize', ->

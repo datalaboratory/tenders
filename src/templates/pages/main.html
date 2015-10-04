@@ -2,21 +2,12 @@
 	class="main-container"
 	data-ng-if="isDataPrepared">
 	<div class="header-container">Тендеры в РФ за год</div>
-	<div class="filters-container">
-		<selectbox
-			data-list="filtersDatasets.tenderType"
-			data-ng-model="model.tenderType"></selectbox>
-		<selectbox
-			data-list="filtersDatasets.tenderStatus"
-			data-ng-model="model.tenderStatus"></selectbox>
-		<br class="clear-both" />
-	</div>
+	<div class="filters-container"></div>
 	<div class="bar-chart-container"></div>
 	<div class="map-container">
 		<map
 			data-map-data="mapData"
 			data-cities-data="citiesData"
-			data-field-colors="fieldColors"
 			data-duration="duration"></map>
 	</div>
 </div>

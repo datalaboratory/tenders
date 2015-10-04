@@ -12,6 +12,7 @@
     "angular-route": "~1.4.6",
     "lodash": "~3.10.1",
     "queue-async": "~1.0.7",
-    "topojson": "~1.6.19"
+    "topojson": "~1.6.19",
+    "moment": "~2.10.6"
   }
 }

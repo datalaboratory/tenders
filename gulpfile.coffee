@@ -38,6 +38,7 @@ vendors =
     'bower_components/queue-async/queue.js'
     'bower_components/topojson/topojson.js'
     'bower_components/lodash/lodash.js'
+    'bower_components/moment/moment.js'
     'external_libs/ilya-birman-likely-2.0/likely.js'
     'external_libs/angular-selectbox/angular-selectbox.js'
   ]

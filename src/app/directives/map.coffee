@@ -4,7 +4,6 @@ app.directive 'map', ->
   scope:
     mapData: '='
     citiesData: '='
-    fieldColors: '='
     duration: '='
   link: ($scope, $element, $attrs) ->
     element = $element[0]
@@ -29,8 +28,6 @@ app.directive 'map', ->
     .attr 'width', width * containerScale
     .attr 'height', height * containerScale
 
-    regionCodes = _.uniq(_.pluck(topojson.feature($scope.mapData, $scope.mapData.objects.russia).features, 'properties.region'))
-
     regions = svg.append 'g'
     .classed 'regions', true
     .selectAll 'path'
@@ -40,7 +37,7 @@ app.directive 'map', ->
     .classed 'region', true
     .attr 'd', path
     .attr 'id', (d) -> d.properties.region
-    .style 'fill', (d) -> $scope.fieldColors[_.indexOf(regionCodes, d.properties.region) % 24]
+    .style 'fill', (d) -> '#9cd994'
     .style 'opacity', 1
 
     cities = svg.append 'g'
