@@ -51,9 +51,29 @@ app.directive 'map', ->
 
       bestField
 
-    updateColors = ->
+    paintRegionsByBestField = ->
       $scope.legend.bestFields = []
       regions.style('fill', (d) -> $scope.fieldColors[getBestField(d)])
+      return
+
+    paintRegionsBySelectedField = ->
+      prices = {}
+      regions[0].forEach (d) ->
+        region = d.__data__
+        filteredTenders = $scope.tenders.filter (t) ->
+          (t.code is region.properties.region) and
+          (t.field is $scope.filters.fields[$scope.filters.field].name) and
+          (if $scope.filters.price then $scope.filters.prices[$scope.filters.price].leftLimit <= t.price <= $scope.filters.prices[$scope.filters.price].rightLimit else true) and
+          (if $scope.filters.region then t.region is $scope.filters.regions[$scope.filters.region].name else true)
+
+        prices[region.properties.region] = d3.sum _.pluck filteredTenders, 'price'
+        return
+
+      colorScale = d3.scale.linear()
+      .domain d3.extent _.values prices
+      .range [$scope.fieldColors['None'], $scope.fieldColors[$scope.filters.fields[$scope.filters.field].name]]
+
+      regions.style('fill', (d) -> colorScale(prices[d.properties.region]))
       return
 
     svg = d3element.append 'svg'
@@ -71,6 +91,8 @@ app.directive 'map', ->
     .attr 'd', path
     .attr 'id', (d) -> d.properties.region
     .style 'fill', (d) -> $scope.fieldColors[getBestField(d)]
+    .style 'stroke', '#ccc'
+    .style 'stroke-width', .5
     .style 'opacity', 1
 
     cities = svg.append 'g'
@@ -116,11 +138,19 @@ app.directive 'map', ->
       .style 'font-size', if containerScale > 1 then '12px' else '10px'
       return
 
+    # Field filter
+    $scope.$watch 'filters.field', ->
+      if $scope.filters.field
+        paintRegionsBySelectedField()
+      else
+        paintRegionsByBestField()
+      return
+
     # Price filter
-    $scope.$watch 'filters.price', -> updateColors()
+    $scope.$watch 'filters.price', -> paintRegionsByBestField()
 
     # Region filter
-    $scope.$watch 'filters.region', -> updateColors()
+    $scope.$watch 'filters.region', -> paintRegionsByBestField()
 
     ###
     # Legend
