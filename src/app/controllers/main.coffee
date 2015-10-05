@@ -122,18 +122,6 @@ app.controller 'mainCtrl', ($scope) ->
         name: d
       return
 
-    $scope.filters.field = 0
-
-    $scope.filters.regions = [{id: 0, name: 'Все регионы'}]
-
-    _.uniq(_.pluck($scope.tenders, 'region')).sort().forEach (d, i) ->
-      $scope.filters.regions.push
-        id: i + 1
-        name: d
-      return
-
-    $scope.filters.region = 0
-
     $scope.filters.prices = [
       {
         id: 0
@@ -167,7 +155,17 @@ app.controller 'mainCtrl', ($scope) ->
       }
     ]
 
+    $scope.filters.regions = [{id: 0, name: 'Все регионы'}]
+
+    _.uniq(_.pluck($scope.tenders, 'region')).sort().forEach (d, i) ->
+      $scope.filters.regions.push
+        id: i + 1
+        name: d
+      return
+
+    $scope.filters.field = 0
     $scope.filters.price = 0
+    $scope.filters.region = 0
 
     # Load map data
     queue()

@@ -31,7 +31,8 @@ app.directive 'map', ->
       bestField = 'None'
       filteredTenders = $scope.tenders.filter (t) ->
         t.code is region.properties.region and
-        if $scope.filters.price then $scope.filters.prices[$scope.filters.price].leftLimit <= t.price <= $scope.filters.prices[$scope.filters.price].rightLimit else true
+        if $scope.filters.price then $scope.filters.prices[$scope.filters.price].leftLimit <= t.price <= $scope.filters.prices[$scope.filters.price].rightLimit else true and
+        if $scope.filters.region then t.region is $scope.filters.regions[$scope.filters.region].name else true
 
       if filteredTenders.length
         regionFields = []
@@ -109,9 +110,12 @@ app.directive 'map', ->
 
     # Price filter
     $scope.$watch 'filters.price', ->
-      regions.transition()
-      .duration $scope.duration
-      .style 'fill', (d) -> $scope.fieldColors[getBestField(d)]
+      regions.style('fill', (d) -> $scope.fieldColors[getBestField(d)])
+      return
+
+    # Region filter
+    $scope.$watch 'filters.region', ->
+      regions.style('fill', (d) -> $scope.fieldColors[getBestField(d)])
       return
 
     ###
