@@ -7,8 +7,8 @@ app.directive 'map', ->
     tenders: '='
     fieldColors: '='
     duration: '='
-    legend: '='
     filters: '='
+    legend: '='
   link: ($scope, $element, $attrs) ->
     element = $element[0]
     d3element = d3.select element
@@ -28,9 +28,10 @@ app.directive 'map', ->
     path = d3.geo.path().projection projection
 
     getBestField = (region) ->
-      bestField = ''
+      bestField = 'None'
       filteredTenders = $scope.tenders.filter (t) ->
-        t.code is region.properties.region
+        t.code is region.properties.region and
+        if $scope.filters.price then $scope.filters.prices[$scope.filters.price].leftLimit <= t.price <= $scope.filters.prices[$scope.filters.price].rightLimit else true
 
       if filteredTenders.length
         regionFields = []
@@ -83,6 +84,7 @@ app.directive 'map', ->
     .style 'fill', '#555'
     .style 'font-size', if containerScale > 1 then '12px' else '10px'
 
+    # Resize
     $scope.$on 'render', ($event) ->
       containerScale = $element.parent().width() / width
 
@@ -105,6 +107,15 @@ app.directive 'map', ->
       .style 'font-size', if containerScale > 1 then '12px' else '10px'
       return
 
+    # Price filter
+    $scope.$watch 'filters.price', ->
+      regions.transition()
+      .duration $scope.duration
+      .style 'fill', (d) -> $scope.fieldColors[getBestField(d)]
+      return
+
+    ###
+    # Legend
     $scope.$watch 'legend.field', ->
       regions.transition()
       .duration $scope.duration
@@ -115,5 +126,6 @@ app.directive 'map', ->
         else
           1
       return
+    ###
 
     return

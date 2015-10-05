@@ -25,13 +25,7 @@ app.controller 'mainCtrl', ($scope) ->
   $scope.mapData = {}
   $scope.citiesData = []
 
-  $scope.filters =
-    field: 0
-    fields: ['Все индустрии']
-    price: 0
-    prices: ['Все цены']
-    region: 0
-    regions: ['Все регионы']
+  $scope.filters = {}
 
   $scope.legend =
     field: ''
@@ -120,9 +114,60 @@ app.controller 'mainCtrl', ($scope) ->
     $scope.tenders = $scope.tenders.filter (t) -> startDate < t.date < endDate
 
     # Create filters
-    $scope.filters.fields = $scope.filters.fields.concat(_.uniq(_.pluck($scope.tenders, 'field')).sort())
-    $scope.filters.regions = $scope.filters.regions.concat(_.uniq(_.pluck($scope.tenders, 'region')).sort())
-    $scope.filters.prices = $scope.filters.prices.concat(['до 1,5 млн', '1,5…2,5 млн', '2,5…5 млн', 'от 5 млн'])
+    $scope.filters.fields = [{id: 0, name: 'Все индустрии'}]
+
+    _.uniq(_.pluck($scope.tenders, 'field')).sort().forEach (d, i) ->
+      $scope.filters.fields.push
+        id: i + 1
+        name: d
+      return
+
+    $scope.filters.field = 0
+
+    $scope.filters.regions = [{id: 0, name: 'Все регионы'}]
+
+    _.uniq(_.pluck($scope.tenders, 'region')).sort().forEach (d, i) ->
+      $scope.filters.regions.push
+        id: i + 1
+        name: d
+      return
+
+    $scope.filters.region = 0
+
+    $scope.filters.prices = [
+      {
+        id: 0
+        name: 'Все цены'
+        leftLimit: 0
+        rightLimit: Infinity
+      }
+      {
+        id: 0
+        name: 'до 1,5 млн'
+        leftLimit: 0
+        rightLimit: 1500000
+      }
+      {
+        id: 0
+        name: '1,5…2,5 млн'
+        leftLimit: 1500000
+        rightLimit: 2500000
+      }
+      {
+        id: 0
+        name: '2,5…5 млн'
+        leftLimit: 2500000
+        rightLimit: 5000000
+      }
+      {
+        id: 0
+        name: 'от 5 млн'
+        leftLimit: 5000000
+        rightLimit: Infinity
+      }
+    ]
+
+    $scope.filters.price = 0
 
     # Load map data
     queue()
