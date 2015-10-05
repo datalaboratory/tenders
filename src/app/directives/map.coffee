@@ -46,7 +46,15 @@ app.directive 'map', ->
 
         bestField = _.max(regionFields, 'overall').name
 
+        if $scope.legend.bestFields.indexOf(bestField) is -1
+          $scope.legend.bestFields.push bestField
+
       bestField
+
+    updateColors = ->
+      $scope.legend.bestFields = []
+      regions.style('fill', (d) -> $scope.fieldColors[getBestField(d)])
+      return
 
     svg = d3element.append 'svg'
     .classed 'map', true
@@ -109,14 +117,10 @@ app.directive 'map', ->
       return
 
     # Price filter
-    $scope.$watch 'filters.price', ->
-      regions.style('fill', (d) -> $scope.fieldColors[getBestField(d)])
-      return
+    $scope.$watch 'filters.price', -> updateColors()
 
     # Region filter
-    $scope.$watch 'filters.region', ->
-      regions.style('fill', (d) -> $scope.fieldColors[getBestField(d)])
-      return
+    $scope.$watch 'filters.region', -> updateColors()
 
     ###
     # Legend

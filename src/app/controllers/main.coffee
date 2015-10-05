@@ -29,7 +29,7 @@ app.controller 'mainCtrl', ($scope) ->
 
   $scope.legend =
     field: ''
-    realFields: []
+    bestFields: []
 
   $scope.isDataPrepared = false
 
