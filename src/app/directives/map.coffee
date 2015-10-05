@@ -8,6 +8,7 @@ app.directive 'map', ->
     fieldColors: '='
     duration: '='
     legend: '='
+    filters: '='
   link: ($scope, $element, $attrs) ->
     element = $element[0]
     d3element = d3.select element
@@ -26,28 +27,24 @@ app.directive 'map', ->
 
     path = d3.geo.path().projection projection
 
-    getRegionColor = (region) ->
-      regionTenders = $scope.tenders.filter (t) -> t.code is region.properties.region
+    getBestField = (region) ->
+      bestField = ''
+      filteredTenders = $scope.tenders.filter (t) ->
+        t.code is region.properties.region
 
-      if regionTenders.length
+      if filteredTenders.length
         regionFields = []
 
-        _.uniq(_.pluck(regionTenders, 'field')).forEach (d) ->
-          fieldTenders = regionTenders.filter (rT) -> rT.field is d
+        _.uniq(_.pluck(filteredTenders, 'field')).forEach (d) ->
+          fieldTenders = filteredTenders.filter (fT) -> fT.field is d
           regionFields.push
             name: d
             overall: d3.sum _.pluck fieldTenders, 'price'
           return
 
-        biggestField = _.max(regionFields, 'overall').name
-        color = $scope.fieldColors[biggestField]
+        bestField = _.max(regionFields, 'overall').name
 
-        if $scope.legend.realFields.indexOf(biggestField) is -1
-            $scope.legend.realFields.push biggestField
-      else
-        color = '#f0f0f0'
-
-      color
+      bestField
 
     svg = d3element.append 'svg'
     .classed 'map', true
@@ -63,7 +60,7 @@ app.directive 'map', ->
     .classed 'region', true
     .attr 'd', path
     .attr 'id', (d) -> d.properties.region
-    .style 'fill', getRegionColor
+    .style 'fill', (d) -> $scope.fieldColors[getBestField(d)]
     .style 'opacity', 1
 
     cities = svg.append 'g'
@@ -114,7 +111,7 @@ app.directive 'map', ->
       .style 'opacity', (d) ->
         color = d3.select(@).style('fill')
         if $scope.legend.field
-          if color is $scope.legend.field then 1 else .2
+          if color is $scope.fieldColors[$scope.legend.field] then 1 else .2
         else
           1
       return
