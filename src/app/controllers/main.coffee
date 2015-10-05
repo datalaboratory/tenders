@@ -25,6 +25,14 @@ app.controller 'mainCtrl', ($scope) ->
   $scope.mapData = {}
   $scope.citiesData = []
 
+  $scope.filters =
+    field: 0
+    fields: ['Все индустрии']
+    price: 0
+    prices: ['Все цены']
+    region: 0
+    regions: ['Все регионы']
+
   $scope.legend =
     field: ''
     realFields: []
@@ -110,6 +118,11 @@ app.controller 'mainCtrl', ($scope) ->
     endDate = moment('2015-08-01', dateFormat).toDate()
 
     $scope.tenders = $scope.tenders.filter (t) -> startDate < t.date < endDate
+
+    # Create filters
+    $scope.filters.fields = $scope.filters.fields.concat(_.uniq(_.pluck($scope.tenders, 'field')).sort())
+    $scope.filters.regions = $scope.filters.regions.concat(_.uniq(_.pluck($scope.tenders, 'region')).sort())
+    $scope.filters.prices = $scope.filters.prices.concat(['до 1,5 млн', '1,5…2,5 млн', '2,5…5 млн', 'от 5 млн'])
 
     # Load map data
     queue()

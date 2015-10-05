@@ -1,0 +1,31 @@
+@import '../variables';
+
+.filters {
+  .mad-selectbox {
+    float: left;
+  }
+
+  .mad-selectbox:not(:first-child) {
+    margin-left: $filters-gap;
+  }
+
+  .mad-selectbox.field-filter {
+    width: 400px;
+  }
+
+  .mad-selectbox.price-filter {
+    width: 280px;
+  }
+
+  .mad-selectbox.region-filter {
+    width: 280px;
+  }
+
+  .reset-button {
+    float: left;
+    margin: 4px 0 0 10px;
+    font-size: 22px;
+    color: #e95c63;
+    cursor: pointer;
+  }
+}

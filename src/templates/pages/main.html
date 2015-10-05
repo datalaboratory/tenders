@@ -2,7 +2,11 @@
 	class="main-container"
 	data-ng-if="isDataPrepared">
 	<div class="header-container">Тендеры в РФ за год</div>
-	<div class="filters-container"></div>
+	<div class="filters-container">
+		<filters
+			data-filters="filters">
+		</filters>
+	</div>
 	<div class="bar-chart-container"></div>
 	<div class="map-container">
 		<map
