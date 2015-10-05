@@ -1,31 +1,40 @@
 @import '../variables';
 
 .legend {
-  .item {
-    cursor: pointer;
-    transition: opacity .5s ease-out;
+  .column {
+    display: inline-block;
+    vertical-align: top;
 
-    .sample {
-      float: left;
-      margin: 1px 0 0 0;
-      width: 13px;
-      height: 13px;
-      border-radius: 50%;
+    .item {
+      cursor: pointer;
+      transition: opacity .5s ease-out;
+
+      .sample {
+        float: left;
+        margin: 1px 0 0 0;
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+      }
+
+      .caption {
+        float: left;
+        margin: 0 0 0 5px;
+        font-family: $helvetica-neue-light;
+        font-size: $small-font-size;
+      }
     }
 
-    .caption {
-      float: left;
-      margin: 0 0 0 5px;
-      font-family: $helvetica-neue-light;
-      font-size: $small-font-size;
+    .item:not(:last-child) {
+      margin: 0 0 10px 0;
+    }
+
+    .item.hidden {
+      opacity: .2;
     }
   }
 
-  .item:not(:last-child) {
-    margin: 0 0 10px 0;
-  }
-
-  .item.hidden {
-    opacity: .2;
+  .column:not(:first-child) {
+    margin-left: 40px;
   }
 }

@@ -1,12 +1,17 @@
 <div class="legend">
   <div
-    class="item"
-    data-ng-repeat="field in legend.bestFields | orderBy:'toString()'"
-    data-ng-class="{'hidden': map.color ? (fieldColors[field] !== map.color) : false}"
-    data-ng-mouseover="legend.field = field"
-    data-ng-mouseleave="legend.field = ''">
-    <div class="sample" data-ng-style="{'background-color': fieldColors[field]}"></div>
-    <div class="caption">{{field}}</div>
-    <br class="clear-both" />
+    class="column"
+    data-ng-repeat="i in range(nOfColumns) track by $index">
+    <div
+      class="item"
+      data-ng-repeat="field in legend.bestFields | orderBy:'toString()' | limitTo:nOfItemsInColumn:($index * nOfItemsInColumn)"
+      data-ng-class="{'hidden': map.color ? (fieldColors[field] !== map.color) : false}"
+      data-ng-mouseover="legend.field = field"
+      data-ng-mouseleave="legend.field = ''">
+      <div class="sample" data-ng-style="{'background-color': fieldColors[field]}"></div>
+      <div class="caption">{{field}}</div>
+      <br class="clear-both" />
+    </div>
   </div>
+  <br class="clear-both" />
 </div>
