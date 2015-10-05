@@ -58,6 +58,7 @@ app.directive 'map', ->
       return
 
     paintRegionsBySelectedField = ->
+      $scope.legend.bestFields = [$scope.filters.fields[$scope.filters.field].name]
       prices = {}
       regions[0].forEach (d) ->
         region = d.__data__
