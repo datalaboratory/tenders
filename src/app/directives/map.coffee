@@ -40,9 +40,7 @@ app.directive 'map', ->
 
         $scope.fieldColors[_.max(regionFields, 'overall').name]
       else
-        '#e6e6e6'
-
-
+        '#f0f0f0'
 
     svg = d3element.append 'svg'
     .classed 'map', true

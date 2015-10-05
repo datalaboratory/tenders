@@ -1,0 +1,15 @@
+<div class="legend">
+  <div
+    class="column"
+    data-ng-repeat="i in [0, 1, 2, 3]">
+    <div
+      class="item"
+      data-ng-repeat="(key, value) in fieldColors"
+      data-ng-if="$index % 4 === i">
+      <div class="sample" data-ng-style="{'background-color': value}"></div>
+      <div class="caption">{{key}}</div>
+      <br class="clear-both" />
+    </div>
+  </div>
+  <br class="clear-both" />
+</div>

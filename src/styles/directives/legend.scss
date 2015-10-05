@@ -1,0 +1,32 @@
+@import '../variables';
+
+.legend {
+  .column {
+    display: inline-block;
+
+    .item {
+      .sample {
+        float: left;
+        margin: 1px 0 0 0;
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+      }
+
+      .caption {
+        float: left;
+        margin: 0 0 0 5px;
+        font-family: $helvetica-neue-light;
+        font-size: $small-font-size;
+      }
+    }
+
+    .item:not(:last-child) {
+      margin: 0 0 10px 0;
+    }
+  }
+
+  .column:not(:first-child) {
+    margin: 0 0 0 30px;
+  }
+}
