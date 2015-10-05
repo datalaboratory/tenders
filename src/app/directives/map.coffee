@@ -7,6 +7,7 @@ app.directive 'map', ->
     tenders: '='
     fieldColors: '='
     duration: '='
+    legend: '='
   link: ($scope, $element, $attrs) ->
     element = $element[0]
     d3element = d3.select element
@@ -38,9 +39,15 @@ app.directive 'map', ->
             overall: d3.sum _.pluck fieldTenders, 'price'
           return
 
-        $scope.fieldColors[_.max(regionFields, 'overall').name]
+        biggestField = _.max(regionFields, 'overall').name
+        color = $scope.fieldColors[biggestField]
+
+        if $scope.legend.realFields.indexOf(biggestField) is -1
+            $scope.legend.realFields.push biggestField
       else
-        '#f0f0f0'
+        color = '#f0f0f0'
+
+      color
 
     svg = d3element.append 'svg'
     .classed 'map', true
@@ -99,6 +106,17 @@ app.directive 'map', ->
 
       cities.selectAll 'text'
       .style 'font-size', if containerScale > 1 then '12px' else '10px'
+      return
+
+    $scope.$watch 'legend.field', ->
+      regions.transition()
+      .duration $scope.duration
+      .style 'opacity', (d) ->
+        color = d3.select(@).style('fill')
+        if $scope.legend.field
+          if color is $scope.legend.field then 1 else .2
+        else
+          1
       return
 
     return

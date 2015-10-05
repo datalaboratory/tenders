@@ -5,6 +5,8 @@
     display: inline-block;
 
     .item {
+      cursor: pointer;
+
       .sample {
         float: left;
         margin: 1px 0 0 0;
@@ -26,7 +28,7 @@
     }
   }
 
-  .column:not(:first-child) {
-    margin: 0 0 0 30px;
+  .column {
+    margin-left: 40px;
   }
 }

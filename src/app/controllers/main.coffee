@@ -25,6 +25,10 @@ app.controller 'mainCtrl', ($scope) ->
   $scope.mapData = {}
   $scope.citiesData = []
 
+  $scope.legend =
+    field: ''
+    realFields: []
+
   $scope.isDataPrepared = false
 
   # Parse main data
