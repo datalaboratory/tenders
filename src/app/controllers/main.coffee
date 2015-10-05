@@ -27,6 +27,9 @@ app.controller 'mainCtrl', ($scope) ->
 
   $scope.filters = {}
 
+  $scope.map =
+    color: ''
+
   $scope.legend =
     field: ''
     bestFields: []

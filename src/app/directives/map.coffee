@@ -8,6 +8,7 @@ app.directive 'map', ->
     fieldColors: '='
     duration: '='
     filters: '='
+    map: '='
     legend: '='
   link: ($scope, $element, $attrs) ->
     element = $element[0]
@@ -94,6 +95,14 @@ app.directive 'map', ->
     .style 'stroke', '#ccc'
     .style 'stroke-width', .5
     .style 'opacity', 1
+    .on 'mouseover', ->
+      $scope.map.color = d3.select(@).style('fill')
+      $scope.$apply()
+      return
+    .on 'mouseout', ->
+      $scope.map.color = ''
+      $scope.$apply()
+      return
 
     cities = svg.append 'g'
     .classed 'cities', true
@@ -152,7 +161,6 @@ app.directive 'map', ->
     # Region filter
     $scope.$watch 'filters.region', -> paintRegionsByBestField()
 
-    ###
     # Legend
     $scope.$watch 'legend.field', ->
       regions.transition()
@@ -164,6 +172,5 @@ app.directive 'map', ->
         else
           1
       return
-    ###
 
     return

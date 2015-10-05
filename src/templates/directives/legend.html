@@ -1,27 +1,12 @@
 <div class="legend">
-  <div class="column">
-    <div
-      class="item"
-      data-ng-repeat="field in legend.realFields | orderBy:'toString()'"
-      data-ng-if="$index < 7"
-      data-ng-mouseover="legend.field = fieldColors[field]"
-      data-ng-mouseleave="legend.field = ''">
-      <div class="sample" data-ng-style="{'background-color': fieldColors[field]}"></div>
-      <div class="caption">{{field}}</div>
-      <br class="clear-both" />
-    </div>
+  <div
+    class="item"
+    data-ng-repeat="field in legend.bestFields | orderBy:'toString()'"
+    data-ng-class="{'hidden': map.color ? (fieldColors[field] !== map.color) : false}"
+    data-ng-mouseover="legend.field = field"
+    data-ng-mouseleave="legend.field = ''">
+    <div class="sample" data-ng-style="{'background-color': fieldColors[field]}"></div>
+    <div class="caption">{{field}}</div>
+    <br class="clear-both" />
   </div>
-  <div class="column">
-    <div
-      class="item"
-      data-ng-repeat="field in legend.realFields | orderBy:'toString()'"
-      data-ng-if="$index > 6"
-      data-ng-mouseover="legend.field = fieldColors[field]"
-      data-ng-mouseleave="legend.field = ''">
-      <div class="sample" data-ng-style="{'background-color': fieldColors[field]}"></div>
-      <div class="caption">{{field}}</div>
-      <br class="clear-both" />
-    </div>
-  </div>
-  <br class="clear-both" />
 </div>
