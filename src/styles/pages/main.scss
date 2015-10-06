@@ -11,14 +11,16 @@
 		margin: 20px $common-margin 0 $common-margin;
 	}
 
-	.bar-chart-container {
-		margin: 20px $common-margin / 2 0 $common-margin;
-		width: calc(40% - #{$common-margin} * 1.5);
-	}
+	.content {
+		.bar-chart-container {
+			margin: 20px 0 0 $common-margin;
+			width: calc(40% - #{$common-margin});
+		}
 
-	.map-container {
-		margin: 20px $common-margin 0 $common-margin / 2;
-		width: calc(60% - #{$common-margin} * 1.5);
+		.map-container {
+			margin: 20px $common-margin 0 0;
+			width: calc(60% - #{$common-margin});
+		}
 	}
 
 	.legend-container {

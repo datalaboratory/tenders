@@ -36,6 +36,8 @@ app.controller 'mainCtrl', ($scope) ->
 
   $scope.map =
     color: undefined
+    width: undefined
+    height: undefined
 
   $scope.legend =
     field: undefined

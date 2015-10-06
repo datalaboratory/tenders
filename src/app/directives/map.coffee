@@ -11,17 +11,21 @@ app.directive 'map', ->
     element = $element[0]
     d3element = d3.select element
 
-    width = 960
-    height = 500
-    projectionScale = 700
-    containerScale = $element.parent().width() / width
+    initialWidth = 960
+    initialHeight = 500
+    initialScale = 700
+
+    ratio = $element.parent().width() / initialWidth
+
+    $scope.map.width = initialWidth * ratio
+    $scope.map.height = initialHeight * ratio
 
     projection = d3.geo.albers()
     .rotate [-105, 0]
     .center [-10, 65]
     .parallels [52, 64]
-    .scale projectionScale * containerScale
-    .translate [width * containerScale / 2, height * containerScale / 2]
+    .scale initialScale * ratio
+    .translate [$scope.map.width / 2, $scope.map.height / 2]
 
     path = d3.geo.path().projection projection
 
@@ -77,8 +81,8 @@ app.directive 'map', ->
 
     svg = d3element.append 'svg'
     .classed 'map', true
-    .attr 'width', width * containerScale
-    .attr 'height', height * containerScale
+    .attr 'width', $scope.map.width
+    .attr 'height', $scope.map.height
 
     regions = svg.append 'g'
     .classed 'regions', true
@@ -120,30 +124,7 @@ app.directive 'map', ->
     .attr 'y', -1
     .text (d) -> d.City
     .style 'fill', '#555'
-    .style 'font-size', if containerScale > 1 then '12px' else '10px'
-
-    # Resize
-    $scope.$on 'render', ($event) ->
-      containerScale = $element.parent().width() / width
-
-      svg.transition()
-      .duration $scope.duration
-      .attr 'width', width * containerScale
-      .attr 'height', height * containerScale
-
-      projection.scale(projectionScale * containerScale).translate([width * containerScale / 2, height * containerScale / 2])
-
-      regions.transition()
-      .duration $scope.duration
-      .attr 'd', path
-
-      cities.transition()
-      .duration $scope.duration
-      .attr 'transform', (d) -> 'translate(' + projection([d.lon, d.lat]) + ')'
-
-      cities.selectAll 'text'
-      .style 'font-size', if containerScale > 1 then '12px' else '10px'
-      return
+    .style 'font-size', if ratio > 1 then '12px' else '10px'
 
     # Field filter
     $scope.$watch 'filters.field', ->

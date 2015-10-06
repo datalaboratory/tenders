@@ -7,21 +7,25 @@
 			data-filters="filters">
 		</filters>
 	</div>
-	<div class="bar-chart-container inline">
-		<bar-chart
-			data-data="data"
-			data-filters="filters"
-			data-duration="duration"></bar-chart>
+	<div class="content">
+		<div class="bar-chart-container inline">
+			<bar-chart
+				data-ng-if="map.height"
+				data-data="data"
+				data-filters="filters"
+				data-map="map"
+				data-duration="duration"></bar-chart>
+		</div>
+		<div class="map-container inline">
+			<map
+				data-data="data"
+				data-filters="filters"
+				data-map="map"
+				data-legend="legend"
+				data-duration="duration"></map>
+		</div>
+		<br class="clear-both" />
 	</div>
-	<div class="map-container inline">
-		<map
-			data-data="data"
-			data-filters="filters"
-			data-map="map"
-			data-legend="legend"
-			data-duration="duration"></map>
-	</div>
-	<br class="clear-both" />
 	<div class="legend-container">
 		<legend
 			data-ng-if="legend.fields.length > 1"
