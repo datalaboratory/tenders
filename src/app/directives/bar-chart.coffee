@@ -7,6 +7,7 @@ app.directive 'barChart', ->
     endDate: '='
     filters: '='
     map: '='
+    barChart: '='
     monthNames: '='
     duration: '='
   link: ($scope, $element, $attrs) ->
@@ -70,9 +71,12 @@ app.directive 'barChart', ->
           (moment(t.date).month() is month and moment(t.date).year() is year) and
           (if $scope.filters.field then t.field is $scope.filters.fields[$scope.filters.field].name else true) and
           (if $scope.filters.price then $scope.filters.prices[$scope.filters.price].leftLimit <= t.price <= $scope.filters.prices[$scope.filters.price].rightLimit else true) and
-          (if $scope.filters.region then t.region is $scope.filters.regions[$scope.filters.region].name else true)
+          (if $scope.filters.region then t.region is $scope.filters.regions[$scope.filters.region].name else true) and
+          (if $scope.map.region then t.code is $scope.map.region else true)
 
         tendersByMonth.push
+          month: month
+          year: year
           tenders: filteredTenders
           overall: d3.sum(_.pluck(filteredTenders, 'price'))
 
@@ -86,6 +90,16 @@ app.directive 'barChart', ->
         bar = bars.append 'g'
         .classed 'bar', true
         .attr 'transform', 'translate(' + (i * barWidth + i * barGap) + ', 0)'
+        .on 'mouseover', ->
+          $scope.barChart.month = tBm.month
+          $scope.barChart.year = tBm.year
+          $scope.$apply()
+          return
+        .on 'mouseout', ->
+          $scope.barChart.month = undefined
+          $scope.barChart.year = undefined
+          $scope.$apply()
+          return
 
         groupedTenders = _.groupBy tBm.tenders, if $scope.filters.field then 'id' else 'field'
 
@@ -118,5 +132,8 @@ app.directive 'barChart', ->
 
     # Region filter
     $scope.$watch 'filters.region', -> drawBars()
+
+    # Map region mouseover
+    $scope.$watch 'map.region', -> drawBars()
 
     return

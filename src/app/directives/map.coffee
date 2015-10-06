@@ -5,6 +5,7 @@ app.directive 'map', ->
     data: '='
     filters: '='
     map: '='
+    barChart: '='
     legend: '='
     duration: '='
   link: ($scope, $element, $attrs) ->
@@ -34,7 +35,8 @@ app.directive 'map', ->
       filteredTenders = $scope.data.tenders.filter (t) ->
         (t.code is region.properties.region) and
         (if $scope.filters.price then $scope.filters.prices[$scope.filters.price].leftLimit <= t.price <= $scope.filters.prices[$scope.filters.price].rightLimit else true) and
-        (if $scope.filters.region then t.region is $scope.filters.regions[$scope.filters.region].name else true)
+        (if $scope.filters.region then t.region is $scope.filters.regions[$scope.filters.region].name else true) and
+        (if $scope.barChart.month and $scope.barChart.year then moment(t.date).month() is $scope.barChart.month and moment(t.date).year() is $scope.barChart.year else true)
 
       if filteredTenders.length
         regionFields = []
@@ -67,7 +69,8 @@ app.directive 'map', ->
           (t.code is region.properties.region) and
           (t.field is $scope.filters.fields[$scope.filters.field].name) and
           (if $scope.filters.price then $scope.filters.prices[$scope.filters.price].leftLimit <= t.price <= $scope.filters.prices[$scope.filters.price].rightLimit else true) and
-          (if $scope.filters.region then t.region is $scope.filters.regions[$scope.filters.region].name else true)
+          (if $scope.filters.region then t.region is $scope.filters.regions[$scope.filters.region].name else true) and
+          (if $scope.barChart.month and $scope.barChart.year then moment(t.date).month() is $scope.barChart.month and moment(t.date).year() is $scope.barChart.year else true)
 
         prices[region.properties.region] = d3.sum _.pluck filteredTenders, 'price'
         return
@@ -97,12 +100,15 @@ app.directive 'map', ->
     .style 'stroke', '#ccc'
     .style 'stroke-width', .5
     .style 'opacity', 1
-    .on 'mouseover', ->
+    .on 'mouseover', (d) ->
       $scope.map.color = d3.select(@).style('fill')
+      unless $scope.filters.region
+        $scope.map.region = d.properties.region
       $scope.$apply()
       return
     .on 'mouseout', ->
-      $scope.map.color = ''
+      $scope.map.color = undefined
+      $scope.map.region = undefined
       $scope.$apply()
       return
 
@@ -139,6 +145,15 @@ app.directive 'map', ->
 
     # Region filter
     $scope.$watch 'filters.region', -> paintRegionsByBestField()
+
+    # Month mouseover
+    $scope.$watch 'barChart', ->
+      if $scope.filters.field
+        paintRegionsBySelectedField()
+      else
+        paintRegionsByBestField()
+      return
+    , true
 
     # Legend
     $scope.$watch 'legend.field', ->

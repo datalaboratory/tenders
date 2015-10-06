@@ -36,8 +36,13 @@ app.controller 'mainCtrl', ($scope) ->
 
   $scope.map =
     color: undefined
+    region: undefined
     width: undefined
     height: undefined
+
+  $scope.barChart =
+    month: undefined
+    year: undefined
 
   $scope.legend =
     field: undefined
