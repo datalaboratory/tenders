@@ -1,7 +1,25 @@
 @import '../variables';
 
 .bar-chart {
+  .axis-caption {
+    .caption {
+      font-family: $helvetica-neue-light;
+      font-size: $small-font-size;
+      dominant-baseline: hanging;
+      text-anchor: start;
+    }
+  }
+
   .month-captions {
+    .caption {
+      font-family: $helvetica-neue-light;
+      font-size: $small-font-size;
+      dominant-baseline: central;
+      text-anchor: middle;
+    }
+  }
+
+  .bar {
     .caption {
       font-family: $helvetica-neue-light;
       font-size: $small-font-size;

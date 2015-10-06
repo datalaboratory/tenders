@@ -17,7 +17,7 @@ app.directive 'barChart', ->
     width = $element.parent().width()
     height = $scope.map.height
     margin =
-      top: 20
+      top: 40
       right: 0
       bottom: 20
       left: 0
@@ -30,6 +30,13 @@ app.directive 'barChart', ->
     .classed 'bar-chart', true
     .attr 'width', width
     .attr 'height', height
+
+    svg.append 'g'
+    .classed 'axis-caption', true
+    .attr 'transform', 'translate(0, 0)'
+    .append 'text'
+    .classed 'caption', true
+    .text 'Сумма цен контрактов, млн руб.'
 
     monthCaptions = svg.append 'g'
     .classed 'month-captions', true
@@ -121,6 +128,17 @@ app.directive 'barChart', ->
 
           y -= barHeight
           return
+
+        if tBm.overall
+          bar.append 'text'
+          .classed 'caption', true
+          .attr 'x', barWidth / 2
+          .attr 'y', height - margin.bottom - yScale(tBm.overall) - 10
+          .text (tBm.overall / 1000000).toFixed(1)
+          .style 'opacity', 0
+          .transition()
+          .duration $scope.duration
+          .style 'opacity', 1
         return
       return
 
