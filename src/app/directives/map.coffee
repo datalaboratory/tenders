@@ -3,10 +3,10 @@ app.directive 'map', ->
   templateNamespace: 'svg'
   scope:
     data: '='
-    duration: '='
     filters: '='
     map: '='
     legend: '='
+    duration: '='
   link: ($scope, $element, $attrs) ->
     element = $element[0]
     d3element = d3.select element

@@ -7,8 +7,13 @@
 			data-filters="filters">
 		</filters>
 	</div>
-	<div class="bar-chart-container"></div>
-	<div class="map-container">
+	<div class="bar-chart-container inline">
+		<bar-chart
+			data-data="data"
+			data-filters="filters"
+			data-duration="duration"></bar-chart>
+	</div>
+	<div class="map-container inline">
 		<map
 			data-data="data"
 			data-filters="filters"
@@ -16,6 +21,7 @@
 			data-legend="legend"
 			data-duration="duration"></map>
 	</div>
+	<br class="clear-both" />
 	<div class="legend-container">
 		<legend
 			data-ng-if="legend.fields.length > 1"
