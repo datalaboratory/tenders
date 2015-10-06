@@ -82,6 +82,13 @@ app.directive 'map', ->
       regions.style('fill', (d) -> colorScale(prices[d.properties.region]))
       return
 
+    repaintMap = ->
+      if $scope.filters.field
+        paintRegionsBySelectedField()
+      else
+        paintRegionsByBestField()
+      return
+
     svg = d3element.append 'svg'
     .classed 'map', true
     .attr 'width', $scope.map.width
@@ -133,25 +140,17 @@ app.directive 'map', ->
     .style 'font-size', if ratio > 1 then '12px' else '10px'
 
     # Field filter
-    $scope.$watch 'filters.field', ->
-      if $scope.filters.field
-        paintRegionsBySelectedField()
-      else
-        paintRegionsByBestField()
-      return
+    $scope.$watch 'filters.field', -> repaintMap()
 
     # Price filter
-    $scope.$watch 'filters.price', -> paintRegionsByBestField()
+    $scope.$watch 'filters.price', -> repaintMap()
 
     # Region filter
-    $scope.$watch 'filters.region', -> paintRegionsByBestField()
+    $scope.$watch 'filters.region', -> repaintMap()
 
     # Month mouseover
     $scope.$watch 'barChart', ->
-      if $scope.filters.field
-        paintRegionsBySelectedField()
-      else
-        paintRegionsByBestField()
+      repaintMap()
       return
     , true
 
