@@ -19,7 +19,7 @@ app.directive 'barChart', ->
     margin =
       top: 40
       right: 0
-      bottom: 20
+      bottom: 30
       left: 0
 
     nOfMonths = moment($scope.endDate).diff(moment($scope.startDate), 'months')
@@ -52,14 +52,18 @@ app.directive 'barChart', ->
       year = date.year()
       caption = $scope.monthNames[month].short
 
-      unless month
-        caption += ' ' + year
-
       monthCaptions.append 'text'
       .classed 'caption', true
       .attr 'x', (i - 1) * barWidth + (i - 1) * barGap + barWidth / 2
-      .attr 'y', margin.bottom / 2
+      .attr 'y', 7
       .text caption
+
+      if i is 1 or !month
+        monthCaptions.append 'text'
+        .classed 'caption', true
+        .attr 'x', (i - 1) * barWidth + (i - 1) * barGap + barWidth / 2
+        .attr 'y', 20
+        .text year
 
       i++
 
