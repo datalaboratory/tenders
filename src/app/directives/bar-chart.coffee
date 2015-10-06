@@ -55,7 +55,7 @@ app.directive 'barChart', ->
 
       i++
 
-    drawFields = ->
+    drawBars = ->
       bars.selectAll('*').remove()
 
       tendersByMonth = []
@@ -68,6 +68,7 @@ app.directive 'barChart', ->
 
         filteredTenders = $scope.data.tenders.filter (t) ->
           (moment(t.date).month() is month and moment(t.date).year() is year) and
+          (if $scope.filters.field then t.field is $scope.filters.fields[$scope.filters.field].name else true) and
           (if $scope.filters.price then $scope.filters.prices[$scope.filters.price].leftLimit <= t.price <= $scope.filters.prices[$scope.filters.price].rightLimit else true) and
           (if $scope.filters.region then t.region is $scope.filters.regions[$scope.filters.region].name else true)
 
@@ -85,18 +86,20 @@ app.directive 'barChart', ->
         bar = bars.append 'g'
         .classed 'bar', true
         .attr 'transform', 'translate(' + (i * barWidth + i * barGap) + ', 0)'
-        groupedByFieldTenders = _.groupBy tBm.tenders, 'field'
+
+        groupedTenders = _.groupBy tBm.tenders, if $scope.filters.field then 'id' else 'field'
 
         y = height - margin.bottom
-        _.keys(groupedByFieldTenders).forEach (key) ->
-          barHeight = yScale d3.sum _.pluck groupedByFieldTenders[key], 'price'
+        _.keys(groupedTenders).forEach (key) ->
+          barHeight = yScale d3.sum _.pluck groupedTenders[key], 'price'
+          color = $scope.data.colors[groupedTenders[key][0].field]
 
           bar.append 'rect'
           .classed 'field-rect', true
           .attr 'y', height - margin.bottom
           .attr 'height', 0
           .attr 'width', barWidth
-          .style 'fill', $scope.data.colors[key]
+          .style 'fill', color
           .transition()
           .duration $scope.duration
           .attr 'y', y - barHeight
@@ -107,22 +110,13 @@ app.directive 'barChart', ->
         return
       return
 
-    drawTenders = ->
-      bars.selectAll('*').remove()
-      return
-
     # Field filter
-    $scope.$watch 'filters.field', ->
-      if $scope.filters.field
-        drawTenders()
-      else
-        drawFields()
-      return
+    $scope.$watch 'filters.field', -> drawBars()
 
     # Price filter
-    $scope.$watch 'filters.price', -> drawFields()
+    $scope.$watch 'filters.price', -> drawBars()
 
     # Region filter
-    $scope.$watch 'filters.region', -> drawFields()
+    $scope.$watch 'filters.region', -> drawBars()
 
     return
