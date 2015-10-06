@@ -20,19 +20,29 @@ app.controller 'mainCtrl', ($scope) ->
 
   $scope.duration = 500
 
-  $scope.tenders = []
-  $scope.fieldColors = {}
-  $scope.mapData = {}
-  $scope.citiesData = []
+  $scope.data =
+    tenders: []
+    colors: {}
+    regions: {}
+    cities: []
 
-  $scope.filters = {}
+  $scope.filters =
+    fields: []
+    field: undefined
+    prices: []
+    price: undefined
+    regions: []
+    region: undefined
 
   $scope.map =
-    color: ''
+    color: undefined
 
   $scope.legend =
-    field: ''
-    bestFields: []
+    field: undefined
+    fields: []
+
+  $scope.startDate = undefined
+  $scope.endDate = undefined
 
   $scope.isDataPrepared = false
 
@@ -80,7 +90,7 @@ app.controller 'mainCtrl', ($scope) ->
 
     # Colors
     rawData[5].forEach (rD) ->
-      $scope.fieldColors[rD['field']] = rD['color']
+      $scope.data.colors[rD['field']] = rD['color']
       return
 
     # Tenders
@@ -96,7 +106,7 @@ app.controller 'mainCtrl', ($scope) ->
       region = (if regionObject then regionObject['name'] else '').trim()
       code = codes[region]
 
-      $scope.tenders.push
+      $scope.data.tenders.push
         id: id
         name: name
         type: type
@@ -109,17 +119,17 @@ app.controller 'mainCtrl', ($scope) ->
       return
 
     # Filter tenders by date
-    $scope.tenders.sort (a, b) -> a.date - b.date
+    $scope.data.tenders.sort (a, b) -> a.date - b.date
 
-    startDate = moment('2014-07-31', dateFormat).toDate()
-    endDate = moment('2015-08-01', dateFormat).toDate()
+    $scope.startDate = moment('2014-07-31', dateFormat).toDate()
+    $scope.endDate = moment('2015-08-01', dateFormat).toDate()
 
-    $scope.tenders = $scope.tenders.filter (t) -> startDate < t.date < endDate
+    $scope.data.tenders = $scope.data.tenders.filter (t) -> $scope.startDate < t.date < $scope.endDate
 
     # Create filters
     $scope.filters.fields = [{id: 0, name: 'Все индустрии'}]
 
-    _.uniq(_.pluck($scope.tenders, 'field')).sort().forEach (d, i) ->
+    _.uniq(_.pluck($scope.data.tenders, 'field')).sort().forEach (d, i) ->
       $scope.filters.fields.push
         id: i + 1
         name: d
@@ -160,7 +170,7 @@ app.controller 'mainCtrl', ($scope) ->
 
     $scope.filters.regions = [{id: 0, name: 'Все регионы'}]
 
-    _.uniq(_.pluck($scope.tenders, 'region')).sort().forEach (d, i) ->
+    _.uniq(_.pluck($scope.data.tenders, 'region')).sort().forEach (d, i) ->
       $scope.filters.regions.push
         id: i + 1
         name: d
@@ -182,8 +192,8 @@ app.controller 'mainCtrl', ($scope) ->
     if error
       console.log error
 
-    $scope.mapData = rawData[0]
-    $scope.citiesData = rawData[1]
+    $scope.data.regions = rawData[0]
+    $scope.data.cities = rawData[1]
 
     $scope.isDataPrepared = true
     $('.loading-cover').fadeOut()

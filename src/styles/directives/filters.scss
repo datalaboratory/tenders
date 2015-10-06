@@ -1,12 +1,8 @@
 @import '../variables';
 
 .filters {
-  .mad-selectbox {
-    float: left;
-  }
-
   .mad-selectbox:not(:first-child) {
-    margin-left: $filters-gap;
+    margin-left: 15px;
   }
 
   .mad-selectbox.field-filter {
@@ -22,7 +18,6 @@
   }
 
   .reset-button {
-    float: left;
     margin: 4px 0 0 10px;
     font-size: 22px;
     color: #e95c63;

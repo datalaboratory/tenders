@@ -1,5 +1,8 @@
 @import 'variables';
 
+$selectbox-active-color: #abcecf;
+$selectbox-hover-color: #daf4f5;
+
 .mad-selectbox {
   width: 200px;
   font-family: $helvetica-neue-light;
@@ -44,7 +47,7 @@
     }
 
     li:not(:last-child) {
-      border-color: $thin-line-color;
+      border-color: rgba(0, 0, 0, .083);
     }
 
     li.active {

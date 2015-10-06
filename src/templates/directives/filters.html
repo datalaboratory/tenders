@@ -1,21 +1,21 @@
 <div class="filters">
   <selectbox
-    class="field-filter"
+    class="field-filter inline"
     data-list="filters.fields"
     data-ng-model="filters.field">
   </selectbox>
   <selectbox
-    class="price-filter"
+    class="price-filter inline"
     data-list="filters.prices"
     data-ng-model="filters.price">
   </selectbox>
   <selectbox
-    class="region-filter"
+    class="region-filter inline"
     data-list="filters.regions"
     data-ng-model="filters.region">
   </selectbox>
   <div
-    class="reset-button"
+    class="reset-button inline"
     data-ng-show="filters.field || filters.price || filters.region"
     data-ng-click="resetFilters()">&times;</div>
   <br class="clear-both" />

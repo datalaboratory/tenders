@@ -10,7 +10,6 @@
       transition: opacity .5s ease-out;
 
       .sample {
-        float: left;
         margin: 1px 0 0 0;
         width: 13px;
         height: 13px;
@@ -18,7 +17,6 @@
       }
 
       .caption {
-        float: left;
         margin: 0 0 0 5px;
         font-family: $helvetica-neue-light;
         font-size: $small-font-size;

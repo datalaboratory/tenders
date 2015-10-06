@@ -2,10 +2,7 @@ app.directive 'map', ->
   restrict: 'E'
   templateNamespace: 'svg'
   scope:
-    mapData: '='
-    citiesData: '='
-    tenders: '='
-    fieldColors: '='
+    data: '='
     duration: '='
     filters: '='
     map: '='
@@ -30,7 +27,7 @@ app.directive 'map', ->
 
     getBestField = (region) ->
       bestField = 'None'
-      filteredTenders = $scope.tenders.filter (t) ->
+      filteredTenders = $scope.data.tenders.filter (t) ->
         (t.code is region.properties.region) and
         (if $scope.filters.price then $scope.filters.prices[$scope.filters.price].leftLimit <= t.price <= $scope.filters.prices[$scope.filters.price].rightLimit else true) and
         (if $scope.filters.region then t.region is $scope.filters.regions[$scope.filters.region].name else true)
@@ -47,22 +44,22 @@ app.directive 'map', ->
 
         bestField = _.max(regionFields, 'overall').name
 
-        if $scope.legend.bestFields.indexOf(bestField) is -1
-          $scope.legend.bestFields.push bestField
+        if $scope.legend.fields.indexOf(bestField) is -1
+          $scope.legend.fields.push bestField
 
       bestField
 
     paintRegionsByBestField = ->
-      $scope.legend.bestFields = []
-      regions.style('fill', (d) -> $scope.fieldColors[getBestField(d)])
+      $scope.legend.fields = []
+      regions.style('fill', (d) -> $scope.data.colors[getBestField(d)])
       return
 
     paintRegionsBySelectedField = ->
-      $scope.legend.bestFields = [$scope.filters.fields[$scope.filters.field].name]
+      $scope.legend.fields = [$scope.filters.fields[$scope.filters.field].name]
       prices = {}
       regions[0].forEach (d) ->
         region = d.__data__
-        filteredTenders = $scope.tenders.filter (t) ->
+        filteredTenders = $scope.data.tenders.filter (t) ->
           (t.code is region.properties.region) and
           (t.field is $scope.filters.fields[$scope.filters.field].name) and
           (if $scope.filters.price then $scope.filters.prices[$scope.filters.price].leftLimit <= t.price <= $scope.filters.prices[$scope.filters.price].rightLimit else true) and
@@ -73,7 +70,7 @@ app.directive 'map', ->
 
       colorScale = d3.scale.linear()
       .domain d3.extent _.values prices
-      .range [$scope.fieldColors['None'], $scope.fieldColors[$scope.filters.fields[$scope.filters.field].name]]
+      .range [$scope.data.colors['None'], $scope.data.colors[$scope.filters.fields[$scope.filters.field].name]]
 
       regions.style('fill', (d) -> colorScale(prices[d.properties.region]))
       return
@@ -86,13 +83,13 @@ app.directive 'map', ->
     regions = svg.append 'g'
     .classed 'regions', true
     .selectAll 'path'
-    .data topojson.feature($scope.mapData, $scope.mapData.objects.russia).features
+    .data topojson.feature($scope.data.regions, $scope.data.regions.objects.russia).features
     .enter()
     .append 'path'
     .classed 'region', true
     .attr 'd', path
     .attr 'id', (d) -> d.properties.region
-    .style 'fill', (d) -> $scope.fieldColors[getBestField(d)]
+    .style 'fill', (d) -> $scope.data.colors[getBestField(d)]
     .style 'stroke', '#ccc'
     .style 'stroke-width', .5
     .style 'opacity', 1
@@ -108,7 +105,7 @@ app.directive 'map', ->
     cities = svg.append 'g'
     .classed 'cities', true
     .selectAll 'g'
-    .data $scope.citiesData
+    .data $scope.data.cities
     .enter()
     .append 'g'
     .classed 'city', true
@@ -169,7 +166,7 @@ app.directive 'map', ->
       .style 'opacity', (d) ->
         color = d3.select(@).style('fill')
         if $scope.legend.field
-          if color is $scope.fieldColors[$scope.legend.field] then 1 else .2
+          if color is $scope.data.colors[$scope.legend.field] then 1 else .2
         else
           1
       return
