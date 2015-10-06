@@ -57,7 +57,9 @@ app.directive 'map', ->
 
     paintRegionsByBestField = ->
       $scope.legend.fields = []
-      regions.style('fill', (d) -> $scope.data.colors[getBestField(d)])
+      regions.style 'fill', (d) ->
+        $scope.data.colors[getBestField(d)]
+      .style 'opacity', 1
       return
 
     paintRegionsBySelectedField = ->
