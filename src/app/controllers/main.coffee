@@ -133,6 +133,9 @@ app.controller 'mainCtrl', ($scope) ->
 
     $scope.data.tenders = $scope.data.tenders.filter (t) -> $scope.startDate < t.date < $scope.endDate
 
+    # Leave only top 12 fileds
+    $scope.data.tenders = $scope.data.tenders.filter (t) -> _.has $scope.data.colors, t.field
+
     # Create filters
     $scope.filters.fields = [{id: 0, name: 'Все индустрии'}]
 
