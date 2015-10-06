@@ -75,11 +75,20 @@ app.directive 'map', ->
         prices[region.properties.region] = d3.sum _.pluck filteredTenders, 'price'
         return
 
-      colorScale = d3.scale.linear()
+      opacityScale = d3.scale.linear()
       .domain d3.extent _.values prices
-      .range [$scope.data.colors['None'], $scope.data.colors[$scope.filters.fields[$scope.filters.field].name]]
+      .range [.3, 1]
 
-      regions.style('fill', (d) -> colorScale(prices[d.properties.region]))
+      regions.style 'fill', (region) ->
+        if prices[region.properties.region]
+          $scope.data.colors[$scope.filters.fields[$scope.filters.field].name]
+        else
+          $scope.data.colors['None']
+      .style 'opacity', (region) ->
+        if prices[region.properties.region]
+          opacityScale prices[region.properties.region]
+        else
+          1
       return
 
     repaintMap = ->
