@@ -1,1 +1,12 @@
 @import '../variables';
+
+.bar-chart {
+  .month-captions {
+    .caption {
+      font-family: $helvetica-neue-light;
+      font-size: $small-font-size;
+      dominant-baseline: central;
+      text-anchor: middle;
+    }
+  }
+}

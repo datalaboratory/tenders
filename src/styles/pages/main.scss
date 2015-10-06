@@ -13,17 +13,17 @@
 
 	.content {
 		.bar-chart-container {
-			margin: 20px 0 0 $common-margin;
-			width: calc(40% - #{$common-margin});
+			margin: 20px $common-margin * 0.5 0 $common-margin;
+			width: calc(40% - #{$common-margin} * 1.5);
 		}
 
 		.map-container {
-			margin: 20px $common-margin 0 0;
-			width: calc(60% - #{$common-margin});
+			margin: 20px $common-margin 0 $common-margin * 0.5;
+			width: calc(60% - #{$common-margin} * 1.5);
 		}
 	}
 
 	.legend-container {
-		margin: 0 $common-margin 0 $common-margin;
+		margin: 20px $common-margin 0 $common-margin;
 	}
 }

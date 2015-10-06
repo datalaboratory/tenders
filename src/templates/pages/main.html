@@ -12,8 +12,11 @@
 			<bar-chart
 				data-ng-if="map.height"
 				data-data="data"
+				data-start-date="startDate"
+				data-end-date="endDate"
 				data-filters="filters"
 				data-map="map"
+				data-month-names="monthNames"
 				data-duration="duration"></bar-chart>
 		</div>
 		<div class="map-container inline">
@@ -27,11 +30,11 @@
 		<br class="clear-both" />
 	</div>
 	<div class="legend-container">
-		<legend
+		<!--<legend
 			data-ng-if="legend.fields.length > 1"
 			data-data="data"
 			data-map="map"
 			data-legend="legend">
-		</legend>
+		</legend>-->
 	</div>
 </div>
