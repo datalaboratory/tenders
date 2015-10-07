@@ -26,6 +26,48 @@ app.directive 'barChart', ->
     barGap = width * .01
     barWidth = (width - (nOfMonths - 1) * barGap) / nOfMonths
 
+    tooltip = d3element.append 'div'
+    .classed 'bar-chart-tooltip', true
+    .style 'display', 'none'
+
+    sectionOne = tooltip.append 'div'
+    .classed 'section-one', true
+
+    sectionTwo = tooltip.append 'div'
+    .classed 'section-two', true
+
+    tooltipFieldCaption = sectionOne.append 'div'
+    .classed 'field-caption', true
+
+    tooltipFieldValue = sectionOne.append 'div'
+    .classed 'field-value', true
+
+    tooltipNameValue = sectionTwo.append 'div'
+    .classed 'tender-value', true
+
+    tooltipCustomerCaption = sectionTwo.append 'div'
+    .classed 'tender-caption', true
+    .html 'Заказчик'
+
+    tooltipCustomerValue = sectionTwo.append 'div'
+    .classed 'tender-value', true
+
+    tooltipPriceCaption = sectionTwo.append 'div'
+    .classed 'tender-caption', true
+    .html 'Цена контракта'
+
+    tooltipPriceValue = sectionTwo.append 'div'
+    .classed 'tender-value', true
+
+    tooltipDateCaption = sectionTwo.append 'div'
+    .classed 'tender-caption', true
+    .html 'Дата'
+
+    tooltipDateValue = sectionTwo.append 'div'
+    .classed 'tender-value', true
+
+    tooltipOffset = 20
+
     svg = d3element.append 'svg'
     .classed 'bar-chart', true
     .attr 'width', width
@@ -36,7 +78,7 @@ app.directive 'barChart', ->
     .attr 'transform', 'translate(0, 0)'
     .append 'text'
     .classed 'caption', true
-    .text 'Сумма цен контрактов, млн руб.'
+    .text 'Суммарный объем контрактов, млн руб.'
 
     monthCaptions = svg.append 'g'
     .classed 'month-captions', true
@@ -50,18 +92,34 @@ app.directive 'barChart', ->
       date = moment($scope.startDate).add(i, 'M')
       month = date.month()
       year = date.year()
-      caption = $scope.monthNames[month].short
 
-      monthCaptions.append 'text'
+      caption = monthCaptions.append 'g'
       .classed 'caption', true
-      .attr 'x', (i - 1) * barWidth + (i - 1) * barGap + barWidth / 2
+      .datum {month: month, year: year}
+      .attr 'transform', 'translate(' + ((i - 1) * barWidth + (i - 1) * barGap + barWidth / 2) + ', 0)'
+      .on 'mouseover', (d) ->
+        $scope.barChart.month = d.month
+        $scope.barChart.year = d.year
+        $scope.$apply()
+        return
+      .on 'mouseout', ->
+        $scope.barChart.month = undefined
+        $scope.barChart.year = undefined
+        $scope.$apply()
+        return
+
+      caption.append 'rect'
+      .attr 'x', -(barWidth + barGap) / 2
+      .attr 'width', barWidth + barGap
+      .attr 'height', margin.bottom
+      .style 'fill', '#fff'
+
+      caption.append 'text'
       .attr 'y', 7
-      .text caption
+      .text $scope.monthNames[month].short
 
       if i is 1 or !month
-        monthCaptions.append 'text'
-        .classed 'caption', true
-        .attr 'x', (i - 1) * barWidth + (i - 1) * barGap + barWidth / 2
+        caption.append 'text'
         .attr 'y', 20
         .text year
 
@@ -101,30 +159,56 @@ app.directive 'barChart', ->
         bar = bars.append 'g'
         .classed 'bar', true
         .attr 'transform', 'translate(' + (i * barWidth + i * barGap) + ', 0)'
-        .on 'mouseover', ->
-          $scope.barChart.month = tBm.month
-          $scope.barChart.year = tBm.year
-          $scope.$apply()
-          return
-        .on 'mouseout', ->
-          $scope.barChart.month = undefined
-          $scope.barChart.year = undefined
-          $scope.$apply()
-          return
 
-        groupedTenders = _.groupBy tBm.tenders, if $scope.filters.field then 'id' else 'field'
+        groupedTenders = _.groupBy tBm.tenders, if $scope.filters.field and $scope.filters.region then 'id' else 'field'
 
         y = height - margin.bottom
         _.keys(groupedTenders).forEach (key) ->
-          barHeight = yScale d3.sum _.pluck groupedTenders[key], 'price'
-          color = $scope.data.colors[groupedTenders[key][0].field]
+          field = groupedTenders[key][0].field
+          overall = d3.sum _.pluck groupedTenders[key], 'price'
+          barHeight = yScale overall
+          color = $scope.data.colors[field]
+          tender = groupedTenders[key][0]
 
           bar.append 'rect'
           .classed 'field-rect', true
+          .datum tender
           .attr 'y', height - margin.bottom
           .attr 'height', 0
           .attr 'width', barWidth
+          .attr 'stroke', '#fff'
+          .attr 'stroke-width', if $scope.filters.field and $scope.filters.region then 1 else 0
           .style 'fill', color
+          .on 'mouseover', (d) ->
+            if $scope.filters.field and $scope.filters.region
+              sectionOne.style('display', 'none')
+              sectionTwo.style('display', '')
+              tooltipNameValue.html(d.name)
+              tooltipCustomerValue.html(d.customer)
+              tooltipPriceValue.html((d.price / 1000000).toFixed(1) + ' млн')
+              tooltipDateValue.html(moment(d.date).format('DD.MM.YY'))
+            else if $scope.filters.field
+              sectionOne.style('display', 'none')
+              sectionTwo.style('display', 'none')
+            else
+              sectionOne.style('display', '')
+              sectionTwo.style('display', 'none')
+              tooltipFieldCaption.html(field + ':')
+              tooltipFieldValue.html('&nbsp;' + (overall / 1000000).toFixed(1) + ' млн')
+
+            tooltip
+            .style 'display', 'block'
+            .style 'top', d3.event.pageY + 'px'
+            .style 'left', d3.event.pageX + tooltipOffset + 'px'
+            return
+          .on 'mousemove', ->
+            tooltip
+            .style 'top', d3.event.pageY + 'px'
+            .style 'left', d3.event.pageX + tooltipOffset + 'px'
+            return
+          .on 'mouseout', ->
+            tooltip.style 'display', 'none'
+            return
           .transition()
           .duration $scope.duration
           .attr 'y', y - barHeight

@@ -1,7 +1,7 @@
 <div
 	class="main-container"
 	data-ng-if="isDataPrepared">
-	<div class="header-container">Тендеры в РФ c августа 2014 по июль 2015</div>
+	<div class="header-container">Тендеры в РФ {{barChart.month !== undefined && barChart.year !== undefined ? 'в ' + monthNames[barChart.month].full + ' ' + barChart.year : 'с августа 2014 по июль 2015'}}</div>
 	<div class="filters-container">
 		<filters
 			data-filters="filters">

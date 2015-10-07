@@ -17,15 +17,16 @@
       }
     }
 
-    .additional-info {
-      display: inline-block;
-      margin: 0 0 0 50px;
-    }
-
     .likely {
       display: inline-block;
       float: right;
       font-size: $small-font-size;
     }
+  }
+
+  .additional-info {
+    margin-top: 20px;
+    font-family: $helvetica-neue-light;
+    font-size: $small-font-size;
   }
 }

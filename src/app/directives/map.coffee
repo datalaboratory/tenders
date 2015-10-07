@@ -30,10 +30,15 @@ app.directive 'map', ->
 
     path = d3.geo.path().projection projection
 
-    getBestField = (region) ->
-      bestField = 'None'
+    getFieldsInfo = (region) ->
+      fieldsInfo =
+        best: 'None'
+        bestValue: 0
+        overall: 0
+
       filteredTenders = $scope.data.tenders.filter (t) ->
         (t.code is region.properties.region) and
+        (if $scope.filters.field then t.field is $scope.filters.fields[$scope.filters.field].name else true) and
         (if $scope.filters.price then $scope.filters.prices[$scope.filters.price].leftLimit <= t.price <= $scope.filters.prices[$scope.filters.price].rightLimit else true) and
         (if $scope.filters.region then t.region is $scope.filters.regions[$scope.filters.region].name else true) and
         (if $scope.barChart.month and $scope.barChart.year then moment(t.date).month() is $scope.barChart.month and moment(t.date).year() is $scope.barChart.year else true)
@@ -45,20 +50,22 @@ app.directive 'map', ->
           fieldTenders = filteredTenders.filter (fT) -> fT.field is d
           regionFields.push
             name: d
-            overall: d3.sum _.pluck fieldTenders, 'price'
+            value: d3.sum _.pluck fieldTenders, 'price'
           return
 
-        bestField = _.max(regionFields, 'overall').name
+        fieldsInfo.best =  _.max(regionFields, 'value').name
+        fieldsInfo.bestValue = _.max(regionFields, 'value').value
+        fieldsInfo.overall = d3.sum _.pluck regionFields, 'value'
 
-        if $scope.legend.fields.indexOf(bestField) is -1
-          $scope.legend.fields.push bestField
+        if $scope.legend.fields.indexOf(fieldsInfo.best) is -1
+          $scope.legend.fields.push fieldsInfo.best
 
-      bestField
+      fieldsInfo
 
     paintRegionsByBestField = ->
       $scope.legend.fields = []
       regions.style 'fill', (d) ->
-        $scope.data.colors[getBestField(d)]
+        $scope.data.colors[getFieldsInfo(d).best]
       .style 'opacity', 1
       return
 
@@ -100,6 +107,28 @@ app.directive 'map', ->
         paintRegionsByBestField()
       return
 
+    tooltip = d3element.append 'div'
+    .classed 'map-tooltip', true
+    .style 'display', 'none'
+
+    sectionOne = tooltip.append 'div'
+    sectionTwo = tooltip.append 'div'
+
+    tooltipRegion = sectionOne.append 'div'
+    .classed 'region', true
+
+    tooltipRegionValue = sectionOne.append 'div'
+    .classed 'region value', true
+
+    tooltipField = sectionTwo.append 'div'
+    .classed 'field', true
+
+    tooltipFieldValue = sectionTwo.append 'div'
+    .classed 'field value', true
+
+    tooltipOffset = 20
+    windowWidth = $(window).width()
+
     svg = d3element.append 'svg'
     .classed 'map', true
     .attr 'width', $scope.map.width
@@ -114,8 +143,8 @@ app.directive 'map', ->
     .classed 'region', true
     .attr 'd', path
     .attr 'id', (d) -> d.properties.region
-    .style 'fill', (d) -> $scope.data.colors[getBestField(d)]
-    .style 'stroke', '#ccc'
+    .style 'fill', (d) -> $scope.data.colors[getFieldsInfo(d).best]
+    .style 'stroke', '#f1f1f1'
     .style 'stroke-width', .5
     .style 'opacity', 1
     .on 'mouseover', (d) ->
@@ -123,11 +152,37 @@ app.directive 'map', ->
       unless $scope.filters.region
         $scope.map.region = d.properties.region
       $scope.$apply()
+
+      fieldsInfo = getFieldsInfo d
+
+      tooltipRegion.html(_.invert($scope.data.codes)[d.properties.region] + if fieldsInfo.overall then ':' else '')
+      tooltipRegionValue.style('display', if fieldsInfo.overall then '' else 'none').html('&nbsp;' + (fieldsInfo.overall / 1000000).toFixed(1) + ' млн')
+      sectionTwo.style('display', unless fieldsInfo.best is 'None' or $scope.filters.field then '' else 'none')
+      tooltipField.html('в т.ч. «' + (fieldsInfo.best.split(',')[0]) + (if fieldsInfo.best.indexOf(',') isnt -1 then '...' else '') + '»:')
+      tooltipFieldValue.html('&nbsp;' + (fieldsInfo.bestValue / 1000000).toFixed(1) + ' млн')
+
+      tooltipWidth = tooltip.node().getBoundingClientRect().width
+      tootlipHeight = tooltip.node().getBoundingClientRect().height
+
+      tooltip
+      .style 'display', 'block'
+      .style 'top', d3.event.pageY + 'px'
+      .style 'left', if d3.event.pageX + tooltipWidth + tooltipOffset > windowWidth then d3.event.pageX - tooltipWidth - tooltipOffset + 'px' else d3.event.pageX + tooltipOffset + 'px'
+      return
+    .on 'mousemove', ->
+      tooltipWidth = tooltip.node().getBoundingClientRect().width
+      tootlipHeight = tooltip.node().getBoundingClientRect().height
+
+      tooltip
+      .style 'top', d3.event.pageY + 'px'
+      .style 'left', if d3.event.pageX + tooltipWidth + tooltipOffset > windowWidth then d3.event.pageX - tooltipWidth - tooltipOffset + 'px' else d3.event.pageX + tooltipOffset + 'px'
       return
     .on 'mouseout', ->
       $scope.map.color = undefined
       $scope.map.region = undefined
       $scope.$apply()
+
+      tooltip.style 'display', 'none'
       return
 
     cities = svg.append 'g'
@@ -142,6 +197,13 @@ app.directive 'map', ->
     cities.append 'circle'
     .attr 'r', 1.5
     .style 'fill', '#555'
+
+    cities.append 'text'
+    .classed 'text-background', true
+    .attr 'x', 2
+    .attr 'y', -1
+    .text (d) -> d.City
+    .style 'font-size', if ratio > 1 then '12px' else '10px'
 
     cities.append 'text'
     .attr 'x', 2
@@ -161,6 +223,7 @@ app.directive 'map', ->
 
     # Month mouseover
     $scope.$watch 'barChart', ->
+      console.log $scope.barChart.month, $scope.barChart.year
       repaintMap()
       return
     , true

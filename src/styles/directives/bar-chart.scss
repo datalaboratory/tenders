@@ -1,5 +1,42 @@
 @import '../variables';
 
+.bar-chart-tooltip {
+  position: absolute;
+  background-color: rgba(255, 255, 255, .7);
+  text-align: left;
+  font-family: $helvetica-neue-light;
+  font-size: $small-font-size;
+
+  .section-one {
+    padding: 5px;
+  }
+
+  .section-two {
+    padding: 5px;
+  }
+
+  .field-caption {
+    display: inline-block;
+    font-weight: bold;
+  }
+
+  .field-value {
+    display: inline-block;
+    font-weight: normal;
+  }
+
+  .tender-caption {
+    margin-top: 10px;
+    font-weight: bold;
+  }
+
+  .tender-value {
+    max-width: 300px;
+    margin-top: 5px;
+    font-weight: normal;
+  }
+}
+
 .bar-chart {
   .axis-caption {
     .caption {
@@ -11,18 +48,19 @@
   }
 
   .month-captions {
-    .caption {
+    .caption text {
       font-family: $helvetica-neue-light;
-      font-size: $small-font-size;
+      font-size: 11px;
       dominant-baseline: central;
       text-anchor: middle;
+      cursor: default;
     }
   }
 
   .bar {
     .caption {
       font-family: $helvetica-neue-light;
-      font-size: $small-font-size;
+      font-size: 11px;
       dominant-baseline: central;
       text-anchor: middle;
     }

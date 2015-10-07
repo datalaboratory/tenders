@@ -4,18 +4,18 @@ app.controller 'mainCtrl', ($scope) ->
   dateFormat = 'YYYY-MM-DD'
 
   $scope.monthNames = [
-    {full: 'январь', short: 'янв'},
-    {full: 'февраль', short: 'фев'},
-    {full: 'март', short: 'мар'},
-    {full: 'апрель', short: 'апр'},
-    {full: 'май', short: 'май'},
-    {full: 'июнь', short: 'июнь'},
-    {full: 'июль', short: 'июль'},
-    {full: 'август', short: 'авг'},
-    {full: 'сентябрь', short: 'сен'},
-    {full: 'октябрь', short: 'окт'},
-    {full: 'ноябрь', short: 'ноя'},
-    {full: 'декабрь', short: 'дек'}
+    {full: 'январе', short: 'янв'},
+    {full: 'феврале', short: 'фев'},
+    {full: 'марте', short: 'мар'},
+    {full: 'апреле', short: 'апр'},
+    {full: 'мае', short: 'май'},
+    {full: 'июне', short: 'июнь'},
+    {full: 'июле', short: 'июль'},
+    {full: 'августе', short: 'авг'},
+    {full: 'сентябре', short: 'сен'},
+    {full: 'октябре', short: 'окт'},
+    {full: 'ноябре', short: 'ноя'},
+    {full: 'декабре', short: 'дек'}
   ]
 
   $scope.duration = 500
@@ -25,6 +25,7 @@ app.controller 'mainCtrl', ($scope) ->
     colors: {}
     regions: {}
     cities: []
+    codes: {}
 
   $scope.filters =
     fields: []
@@ -62,7 +63,6 @@ app.controller 'mainCtrl', ($scope) ->
     fields = {}
     companies = {}
     tenderTypes = {}
-    codes = {}
 
     # Regions
     rawData[0].forEach (rD) ->
@@ -92,7 +92,7 @@ app.controller 'mainCtrl', ($scope) ->
 
     # Codes
     rawData[4].forEach (rD) ->
-      codes[rD['name']] = rD['code']
+      $scope.data.codes[rD['name']] = rD['code']
       return
 
     # Colors
@@ -111,7 +111,7 @@ app.controller 'mainCtrl', ($scope) ->
       field = fields[fields[rD['field_id']]['root']]['name']
       regionObject = regions[regions[rD['region_id']]['path'].split(',')[2]]
       region = (if regionObject then regionObject['name'] else '').trim()
-      code = codes[region]
+      code = $scope.data.codes[region]
 
       $scope.data.tenders.push
         id: id
