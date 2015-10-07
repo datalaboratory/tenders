@@ -2,40 +2,43 @@
 
 .bar-chart-tooltip {
   position: absolute;
+  display: none;
   background-color: rgba(255, 255, 255, .7);
   text-align: left;
   font-family: $helvetica-neue-light;
   font-size: $small-font-size;
 
-  .section-one {
+  .field-info {
     padding: 5px;
+
+    .field {
+      display: inline-block;
+      font-weight: bold;
+    }
+
+    .value {
+      display: inline-block;
+      font-weight: normal;
+    }
   }
 
-  .section-two {
+  .tender-info {
     padding: 5px;
-  }
 
-  .field-caption {
-    display: inline-block;
-    font-weight: bold;
-  }
+    .name {
+      max-width: 300px;
+      margin-bottom: 10px;
+    }
 
-  .field-value {
-    display: inline-block;
-    font-weight: normal;
-  }
+    .caption {
+      display: inline-block;
+      font-weight: bold;
+    }
 
-  .tender-caption {
-    display: inline-block;
-    margin-top: 10px;
-    font-weight: bold;
-  }
-
-  .tender-value {
-    display: inline-block;
-    max-width: 300px;
-    margin-top: 5px;
-    font-weight: normal;
+    .value {
+      display: inline-block;
+      font-weight: normal;
+    }
   }
 }
 

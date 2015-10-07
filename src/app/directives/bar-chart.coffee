@@ -1,5 +1,6 @@
 app.directive 'barChart', ->
   restrict: 'E'
+  templateUrl: 'templates/directives/bar-chart.html'
   templateNamespace: 'svg'
   scope:
     data: '='
@@ -26,49 +27,15 @@ app.directive 'barChart', ->
     barGap = width * .01
     barWidth = (width - (nOfMonths - 1) * barGap) / nOfMonths
 
-    tooltip = d3element.append 'div'
-    .classed 'bar-chart-tooltip', true
-    .style 'display', 'none'
-
-    sectionOne = tooltip.append 'div'
-    .classed 'section-one', true
-
-    sectionTwo = tooltip.append 'div'
-    .classed 'section-two', true
-
-    tooltipFieldCaption = sectionOne.append 'div'
-    .classed 'field-caption', true
-
-    tooltipFieldValue = sectionOne.append 'div'
-    .classed 'field-value', true
-
-    tooltipNameValue = sectionTwo.append('div').append('div')
-    .classed 'tender-value', true
-
-    line1 = sectionTwo.append 'div'
-    line2 = sectionTwo.append 'div'
-    line3 = sectionTwo.append 'div'
-
-    tooltipCustomerCaption = line1.append 'div'
-    .classed 'tender-caption', true
-    .html 'Заказчик:'
-
-    tooltipCustomerValue = line1.append 'div'
-    .classed 'tender-value', true
-
-    tooltipPriceCaption = line2.append 'div'
-    .classed 'tender-caption', true
-    .html 'Цена контракта:'
-
-    tooltipPriceValue = line2.append 'div'
-    .classed 'tender-value', true
-
-    tooltipDateCaption = line3.append 'div'
-    .classed 'tender-caption', true
-    .html 'Дата завершения:'
-
-    tooltipDateValue = line3.append 'div'
-    .classed 'tender-value', true
+    tooltip = d3element.select '.bar-chart-tooltip'
+    tooltipFieldInfo = tooltip.select '.field-info'
+    tooltipTenderInfo = tooltip.select '.tender-info'
+    tooltipFieldInfoField = tooltipFieldInfo.select '.field'
+    tooltipFieldInfoValue = tooltipFieldInfo.select '.value'
+    tooltipTenderInfoName = tooltipTenderInfo.select '.name'
+    tooltipTenderInfoCustomer = tooltipTenderInfo.select '.customer'
+    tooltipTenderInfoPrice = tooltipTenderInfo.select '.price'
+    tooltipTenderInfoDate = tooltipTenderInfo.select '.date'
 
     tooltipOffset = 20
 
@@ -177,29 +144,28 @@ app.directive 'barChart', ->
 
           bar.append 'rect'
           .classed 'field-rect', true
-          .datum tender
           .attr 'y', height - margin.bottom
           .attr 'height', 0
           .attr 'width', barWidth
           .attr 'stroke', '#fff'
           .attr 'stroke-width', if $scope.filters.field and $scope.filters.region then 1 else 0
           .style 'fill', color
-          .on 'mouseover', (d) ->
+          .on 'mouseover', ->
             if $scope.filters.field and $scope.filters.region
-              sectionOne.style('display', 'none')
-              sectionTwo.style('display', '')
-              tooltipNameValue.html(d.name)
-              tooltipCustomerValue.html('&nbsp;' + d.customer)
-              tooltipPriceValue.html('&nbsp;' + (d.price / 1000000).toFixed(1) + ' млн')
-              tooltipDateValue.html('&nbsp;' + moment(d.date).format('DD.MM.YY'))
+              tooltipFieldInfo.style 'display', 'none'
+              tooltipTenderInfo.style 'display', ''
+              tooltipTenderInfoName.html tender.name
+              tooltipTenderInfoCustomer.html tender.customer
+              tooltipTenderInfoPrice.html (tender.price / 1000000).toFixed(1) + ' млн'
+              tooltipTenderInfoDate.html moment(tender.date).format('DD.MM.YY')
             else if $scope.filters.field
-              sectionOne.style('display', 'none')
-              sectionTwo.style('display', 'none')
+              tooltipFieldInfo.style 'display', 'none'
+              tooltipTenderInfo.style 'display', 'none'
             else
-              sectionOne.style('display', '')
-              sectionTwo.style('display', 'none')
-              tooltipFieldCaption.html(if field.indexOf(',') isnt -1 then (field.split(',')[0] + '...') else field + ':')
-              tooltipFieldValue.html('&nbsp;' + (overall / 1000000).toFixed(1) + ' млн')
+              tooltipFieldInfo.style 'display', ''
+              tooltipTenderInfo.style 'display', 'none'
+              tooltipFieldInfoField.html (if field.indexOf(',') isnt -1 then (field.split(',')[0] + '...') else field) + ':'
+              tooltipFieldInfoValue.html (overall / 1000000).toFixed(1) + ' млн'
 
             tooltip
             .style 'display', 'block'
@@ -212,7 +178,7 @@ app.directive 'barChart', ->
             .style 'left', d3.event.pageX + tooltipOffset + 'px'
             return
           .on 'mouseout', ->
-            tooltip.style 'display', 'none'
+            tooltip.style 'display', ''
             return
           .transition()
           .duration $scope.duration

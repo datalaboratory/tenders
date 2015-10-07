@@ -153,25 +153,25 @@ app.controller 'mainCtrl', ($scope) ->
         rightLimit: Infinity
       }
       {
-        id: 0
+        id: 1
         name: 'до 1,5 млн'
         leftLimit: 0
         rightLimit: 1500000
       }
       {
-        id: 0
+        id: 2
         name: '1,5…2,5 млн'
         leftLimit: 1500000
         rightLimit: 2500000
       }
       {
-        id: 0
+        id: 3
         name: '2,5…5 млн'
         leftLimit: 2500000
         rightLimit: 5000000
       }
       {
-        id: 0
+        id: 4
         name: 'от 5 млн'
         leftLimit: 5000000
         rightLimit: Infinity
@@ -206,9 +206,10 @@ app.controller 'mainCtrl', ($scope) ->
     $scope.data.cities = rawData[1]
 
     $scope.isDataPrepared = true
-    $('.loading-cover').fadeOut()
 
     $scope.$apply()
+
+    $('.loading-cover').fadeOut()
     return
 
   # Load main data
