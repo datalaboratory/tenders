@@ -26,14 +26,21 @@
   }
 
   .tender-caption {
+    display: inline-block;
     margin-top: 10px;
     font-weight: bold;
   }
 
   .tender-value {
+    display: inline-block;
     max-width: 300px;
     margin-top: 5px;
     font-weight: normal;
+  }
+
+  .tender-value:after {
+    content: '\A';
+    white-space: pre;
   }
 }
 

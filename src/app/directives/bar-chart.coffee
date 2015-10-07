@@ -42,28 +42,32 @@ app.directive 'barChart', ->
     tooltipFieldValue = sectionOne.append 'div'
     .classed 'field-value', true
 
-    tooltipNameValue = sectionTwo.append 'div'
+    tooltipNameValue = sectionTwo.append('div').append('div')
     .classed 'tender-value', true
 
-    tooltipCustomerCaption = sectionTwo.append 'div'
-    .classed 'tender-caption', true
-    .html 'Заказчик'
+    line1 = sectionTwo.append 'div'
+    line2 = sectionTwo.append 'div'
+    line3 = sectionTwo.append 'div'
 
-    tooltipCustomerValue = sectionTwo.append 'div'
+    tooltipCustomerCaption = line1.append 'div'
+    .classed 'tender-caption', true
+    .html 'Заказчик:'
+
+    tooltipCustomerValue = line1.append 'div'
     .classed 'tender-value', true
 
-    tooltipPriceCaption = sectionTwo.append 'div'
+    tooltipPriceCaption = line2.append 'div'
     .classed 'tender-caption', true
-    .html 'Цена контракта'
+    .html 'Цена контракта:'
 
-    tooltipPriceValue = sectionTwo.append 'div'
+    tooltipPriceValue = line2.append 'div'
     .classed 'tender-value', true
 
-    tooltipDateCaption = sectionTwo.append 'div'
+    tooltipDateCaption = line3.append 'div'
     .classed 'tender-caption', true
-    .html 'Дата'
+    .html 'Дата завершения:'
 
-    tooltipDateValue = sectionTwo.append 'div'
+    tooltipDateValue = line3.append 'div'
     .classed 'tender-value', true
 
     tooltipOffset = 20
@@ -97,16 +101,6 @@ app.directive 'barChart', ->
       .classed 'caption', true
       .datum {month: month, year: year}
       .attr 'transform', 'translate(' + ((i - 1) * barWidth + (i - 1) * barGap + barWidth / 2) + ', 0)'
-      .on 'mouseover', (d) ->
-        $scope.barChart.month = d.month
-        $scope.barChart.year = d.year
-        $scope.$apply()
-        return
-      .on 'mouseout', ->
-        $scope.barChart.month = undefined
-        $scope.barChart.year = undefined
-        $scope.$apply()
-        return
 
       caption.append 'rect'
       .attr 'x', -(barWidth + barGap) / 2
@@ -158,7 +152,18 @@ app.directive 'barChart', ->
       tendersByMonth.forEach (tBm, i) ->
         bar = bars.append 'g'
         .classed 'bar', true
+        .datum tBm
         .attr 'transform', 'translate(' + (i * barWidth + i * barGap) + ', 0)'
+        .on 'mouseover', (d) ->
+          $scope.barChart.month = d.month
+          $scope.barChart.year = d.year
+          $scope.$apply()
+          return
+        .on 'mouseout', ->
+          $scope.barChart.month = undefined
+          $scope.barChart.year = undefined
+          $scope.$apply()
+          return
 
         groupedTenders = _.groupBy tBm.tenders, if $scope.filters.field and $scope.filters.region then 'id' else 'field'
 
@@ -184,16 +189,16 @@ app.directive 'barChart', ->
               sectionOne.style('display', 'none')
               sectionTwo.style('display', '')
               tooltipNameValue.html(d.name)
-              tooltipCustomerValue.html(d.customer)
-              tooltipPriceValue.html((d.price / 1000000).toFixed(1) + ' млн')
-              tooltipDateValue.html(moment(d.date).format('DD.MM.YY'))
+              tooltipCustomerValue.html('&nbsp;' + d.customer)
+              tooltipPriceValue.html('&nbsp;' + (d.price / 1000000).toFixed(1) + ' млн')
+              tooltipDateValue.html('&nbsp;' + moment(d.date).format('DD.MM.YY'))
             else if $scope.filters.field
               sectionOne.style('display', 'none')
               sectionTwo.style('display', 'none')
             else
               sectionOne.style('display', '')
               sectionTwo.style('display', 'none')
-              tooltipFieldCaption.html(field + ':')
+              tooltipFieldCaption.html(if field.indexOf(',') isnt -1 then (field.split(',')[0] + '...') else field + ':')
               tooltipFieldValue.html('&nbsp;' + (overall / 1000000).toFixed(1) + ' млн')
 
             tooltip
