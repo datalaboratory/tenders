@@ -36,7 +36,6 @@ app.controller 'mainCtrl', ($scope) ->
     region: undefined
 
   $scope.map =
-    color: undefined
     region: undefined
     width: undefined
     height: undefined
@@ -44,10 +43,7 @@ app.controller 'mainCtrl', ($scope) ->
   $scope.barChart =
     month: undefined
     year: undefined
-
-  $scope.legend =
     field: undefined
-    fields: []
 
   $scope.startDate = undefined
   $scope.endDate = undefined
@@ -223,8 +219,6 @@ app.controller 'mainCtrl', ($scope) ->
   .defer dsv, '../data/tenders/newbicotender_table_tender.csv'
   .awaitAll parseMainData
 
-  $(window).on 'resize', ->
-    $scope.$broadcast 'render'
-    return
+  $(window).on 'resize', -> $scope.$broadcast 'render'
 
   return

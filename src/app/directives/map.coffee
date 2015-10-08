@@ -1,12 +1,12 @@
 app.directive 'map', ->
   restrict: 'E'
+  templateUrl: 'templates/directives/map.html'
   templateNamespace: 'svg'
   scope:
     data: '='
     filters: '='
     map: '='
     barChart: '='
-    legend: '='
     duration: '='
   link: ($scope, $element, $attrs) ->
     element = $element[0]
@@ -31,17 +31,19 @@ app.directive 'map', ->
     path = d3.geo.path().projection projection
 
     getFieldsInfo = (region) ->
+      code = region.properties.region
       fieldsInfo =
         best: 'None'
         bestValue: 0
         overall: 0
 
       filteredTenders = $scope.data.tenders.filter (t) ->
-        (t.code is region.properties.region) and
+        (t.code is code) and
         (if $scope.filters.field then t.field is $scope.filters.fields[$scope.filters.field].name else true) and
         (if $scope.filters.price then $scope.filters.prices[$scope.filters.price].leftLimit <= t.price <= $scope.filters.prices[$scope.filters.price].rightLimit else true) and
         (if $scope.filters.region then t.region is $scope.filters.regions[$scope.filters.region].name else true) and
-        (if $scope.barChart.month and $scope.barChart.year then moment(t.date).month() is $scope.barChart.month and moment(t.date).year() is $scope.barChart.year else true)
+        (if $scope.barChart.field then t.field is $scope.barChart.field else true) and
+        (if $scope.barChart.month isnt undefined and $scope.barChart.year isnt undefined then moment(t.date).month() is $scope.barChart.month and moment(t.date).year() is $scope.barChart.year else true)
 
       if filteredTenders.length
         regionFields = []
@@ -57,40 +59,38 @@ app.directive 'map', ->
         fieldsInfo.bestValue = _.max(regionFields, 'value').value
         fieldsInfo.overall = d3.sum _.pluck regionFields, 'value'
 
-        if $scope.legend.fields.indexOf(fieldsInfo.best) is -1
-          $scope.legend.fields.push fieldsInfo.best
-
       fieldsInfo
 
     paintRegionsByBestField = ->
-      $scope.legend.fields = []
-      regions.style 'fill', (d) ->
+      regions
+      .style 'fill', (d) ->
         $scope.data.colors[getFieldsInfo(d).best]
       .style 'opacity', 1
       return
 
     paintRegionsBySelectedField = ->
-      $scope.legend.fields = [$scope.filters.fields[$scope.filters.field].name]
       prices = {}
-      regions[0].forEach (d) ->
-        region = d.__data__
+      _.keys($scope.data.codes).forEach (key) ->
+        code = $scope.data.codes[key]
         filteredTenders = $scope.data.tenders.filter (t) ->
-          (t.code is region.properties.region) and
-          (t.field is $scope.filters.fields[$scope.filters.field].name) and
+          (t.code is code) and
+          (if $scope.filters.field then t.field is $scope.filters.fields[$scope.filters.field].name else true) and
           (if $scope.filters.price then $scope.filters.prices[$scope.filters.price].leftLimit <= t.price <= $scope.filters.prices[$scope.filters.price].rightLimit else true) and
           (if $scope.filters.region then t.region is $scope.filters.regions[$scope.filters.region].name else true) and
-          (if $scope.barChart.month and $scope.barChart.year then moment(t.date).month() is $scope.barChart.month and moment(t.date).year() is $scope.barChart.year else true)
+          (if $scope.barChart.field then t.field is $scope.barChart.field else true) and
+          (if $scope.barChart.month isnt undefined and $scope.barChart.year isnt undefined then moment(t.date).month() is $scope.barChart.month and moment(t.date).year() is $scope.barChart.year else true)
 
-        prices[region.properties.region] = d3.sum _.pluck filteredTenders, 'price'
+        prices[code] = d3.sum _.pluck filteredTenders, 'price'
         return
 
       opacityScale = d3.scale.linear()
       .domain d3.extent _.values prices
       .range [.3, 1]
 
-      regions.style 'fill', (region) ->
+      regions
+      .style 'fill', (region) ->
         if prices[region.properties.region]
-          $scope.data.colors[$scope.filters.fields[$scope.filters.field].name]
+          if $scope.filters.field then $scope.data.colors[$scope.filters.fields[$scope.filters.field].name] else $scope.data.colors[$scope.barChart.field]
         else
           $scope.data.colors['None']
       .style 'opacity', (region) ->
@@ -101,30 +101,19 @@ app.directive 'map', ->
       return
 
     repaintMap = ->
-      if $scope.filters.field
+      if $scope.filters.field or $scope.barChart.field
         paintRegionsBySelectedField()
       else
         paintRegionsByBestField()
       return
 
-    tooltip = d3element.append 'div'
-    .classed 'map-tooltip', true
-    .style 'display', 'none'
-
-    sectionOne = tooltip.append 'div'
-    sectionTwo = tooltip.append 'div'
-
-    tooltipRegion = sectionOne.append 'div'
-    .classed 'region', true
-
-    tooltipRegionValue = sectionOne.append 'div'
-    .classed 'region value', true
-
-    tooltipField = sectionTwo.append 'div'
-    .classed 'field', true
-
-    tooltipFieldValue = sectionTwo.append 'div'
-    .classed 'field value', true
+    tooltip = d3element.select '.map-tooltip'
+    tooltipRegionInfo = tooltip.select '.region-info'
+    tooltipFieldInfo = tooltip.select '.field-info'
+    tooltipRegionInfoRegion = tooltipRegionInfo.select '.region'
+    tooltipRegionInfoValue = tooltipRegionInfo.select '.value'
+    tooltipFieldInfoField = tooltipFieldInfo.select '.field'
+    tooltipFieldInfoValue = tooltipFieldInfo.select '.value'
 
     tooltipOffset = 20
     windowWidth = $(window).width()
@@ -148,18 +137,17 @@ app.directive 'map', ->
     .style 'stroke-width', .5
     .style 'opacity', 1
     .on 'mouseover', (d) ->
-      $scope.map.color = d3.select(@).style('fill')
       unless $scope.filters.region
         $scope.map.region = d.properties.region
       $scope.$apply()
 
       fieldsInfo = getFieldsInfo d
 
-      tooltipRegion.html(_.invert($scope.data.codes)[d.properties.region] + if fieldsInfo.overall then ':' else '')
-      tooltipRegionValue.style('display', if fieldsInfo.overall then '' else 'none').html('&nbsp;' + (fieldsInfo.overall / 1000000).toFixed(1) + ' млн')
-      sectionTwo.style('display', unless fieldsInfo.best is 'None' or $scope.filters.field then '' else 'none')
-      tooltipField.html('в т.ч. «' + (fieldsInfo.best.split(',')[0]) + (if fieldsInfo.best.indexOf(',') isnt -1 then '...' else '') + '»:')
-      tooltipFieldValue.html('&nbsp;' + (fieldsInfo.bestValue / 1000000).toFixed(1) + ' млн')
+      tooltipRegionInfoRegion.html _.invert($scope.data.codes)[d.properties.region] + (if fieldsInfo.overall then ':' else '')
+      tooltipRegionInfoValue.style('display', if fieldsInfo.overall then '' else 'none').html((fieldsInfo.overall / 1000000).toFixed(1) + ' млн')
+      tooltipFieldInfo.style 'display', unless fieldsInfo.best is 'None' or $scope.filters.field then '' else 'none'
+      tooltipFieldInfoField.html 'в т.ч. «' + fieldsInfo.best.split(',')[0] + (if fieldsInfo.best.indexOf(',') isnt -1 then '...' else '') + '»:'
+      tooltipFieldInfoValue.html (fieldsInfo.bestValue / 1000000).toFixed(1) + ' млн'
 
       tooltipWidth = tooltip.node().getBoundingClientRect().width
       tootlipHeight = tooltip.node().getBoundingClientRect().height
@@ -178,11 +166,10 @@ app.directive 'map', ->
       .style 'left', if d3.event.pageX + tooltipWidth + tooltipOffset > windowWidth then d3.event.pageX - tooltipWidth - tooltipOffset + 'px' else d3.event.pageX + tooltipOffset + 'px'
       return
     .on 'mouseout', ->
-      $scope.map.color = undefined
       $scope.map.region = undefined
       $scope.$apply()
 
-      tooltip.style 'display', 'none'
+      tooltip.style 'display', ''
       return
 
     cities = svg.append 'g'
@@ -223,21 +210,8 @@ app.directive 'map', ->
 
     # Month mouseover
     $scope.$watch 'barChart', ->
-      console.log $scope.barChart.month, $scope.barChart.year
       repaintMap()
       return
     , true
-
-    # Legend
-    $scope.$watch 'legend.field', ->
-      regions.transition()
-      .duration $scope.duration
-      .style 'opacity', (d) ->
-        color = d3.select(@).style('fill')
-        if $scope.legend.field
-          if color is $scope.data.colors[$scope.legend.field] then 1 else .2
-        else
-          1
-      return
 
     return

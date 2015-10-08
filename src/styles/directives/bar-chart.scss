@@ -44,7 +44,7 @@
 
 .bar-chart {
   .axis-caption {
-    .caption {
+    text {
       font-family: $helvetica-neue-light;
       font-size: $small-font-size;
       dominant-baseline: hanging;
@@ -53,17 +53,19 @@
   }
 
   .month-captions {
-    .caption text {
-      font-family: $helvetica-neue-light;
-      font-size: 11px;
-      dominant-baseline: central;
-      text-anchor: middle;
-      cursor: default;
+    .caption {
+      text {
+        font-family: $helvetica-neue-light;
+        font-size: 11px;
+        dominant-baseline: central;
+        text-anchor: middle;
+        cursor: default;
+      }
     }
   }
 
   .bar {
-    .caption {
+    text {
       font-family: $helvetica-neue-light;
       font-size: 11px;
       dominant-baseline: central;

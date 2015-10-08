@@ -48,15 +48,11 @@ app.directive 'barChart', ->
     .classed 'axis-caption', true
     .attr 'transform', 'translate(0, 0)'
     .append 'text'
-    .classed 'caption', true
     .text 'Суммарный объем контрактов, млн руб.'
 
     monthCaptions = svg.append 'g'
     .classed 'month-captions', true
     .attr 'transform', 'translate(0, ' + (height - margin.bottom) + ')'
-
-    bars = svg.append 'g'
-    .classed 'bars', true
 
     i = 1
     while i < nOfMonths + 1
@@ -68,6 +64,16 @@ app.directive 'barChart', ->
       .classed 'caption', true
       .datum {month: month, year: year}
       .attr 'transform', 'translate(' + ((i - 1) * barWidth + (i - 1) * barGap + barWidth / 2) + ', 0)'
+      .on 'mouseover', (d) ->
+        $scope.barChart.month = d.month
+        $scope.barChart.year = d.year
+        $scope.$apply()
+        return
+      .on 'mouseout', ->
+        $scope.barChart.month = undefined
+        $scope.barChart.year = undefined
+        $scope.$apply()
+        return
 
       caption.append 'rect'
       .attr 'x', -(barWidth + barGap) / 2
@@ -85,6 +91,9 @@ app.directive 'barChart', ->
         .text year
 
       i++
+
+    bars = svg.append 'g'
+    .classed 'bars', true
 
     drawBars = ->
       bars.selectAll('*').remove()
@@ -119,38 +128,28 @@ app.directive 'barChart', ->
       tendersByMonth.forEach (tBm, i) ->
         bar = bars.append 'g'
         .classed 'bar', true
-        .datum tBm
         .attr 'transform', 'translate(' + (i * barWidth + i * barGap) + ', 0)'
-        .on 'mouseover', (d) ->
-          $scope.barChart.month = d.month
-          $scope.barChart.year = d.year
-          $scope.$apply()
-          return
-        .on 'mouseout', ->
-          $scope.barChart.month = undefined
-          $scope.barChart.year = undefined
-          $scope.$apply()
-          return
 
         groupedTenders = _.groupBy tBm.tenders, if $scope.filters.field and $scope.filters.region then 'id' else 'field'
 
         y = height - margin.bottom
         _.keys(groupedTenders).forEach (key) ->
-          field = groupedTenders[key][0].field
-          overall = d3.sum _.pluck groupedTenders[key], 'price'
+          tenders = groupedTenders[key]
+          tender = tenders[0]
+          field = tender.field
+          overall = d3.sum _.pluck tenders, 'price'
           barHeight = yScale overall
           color = $scope.data.colors[field]
-          tender = groupedTenders[key][0]
 
-          bar.append 'rect'
-          .classed 'field-rect', true
-          .attr 'y', height - margin.bottom
-          .attr 'height', 0
-          .attr 'width', barWidth
-          .attr 'stroke', '#fff'
-          .attr 'stroke-width', if $scope.filters.field and $scope.filters.region then 1 else 0
-          .style 'fill', color
+          barPiece = bar.append 'g'
+          .classed 'bar-piece', true
           .on 'mouseover', ->
+            $scope.barChart.month = tBm.month
+            $scope.barChart.year = tBm.year
+            unless $scope.filters.field
+              $scope.barChart.field = field
+            $scope.$apply()
+
             if $scope.filters.field and $scope.filters.region
               tooltipFieldInfo.style 'display', 'none'
               tooltipTenderInfo.style 'display', ''
@@ -178,8 +177,34 @@ app.directive 'barChart', ->
             .style 'left', d3.event.pageX + tooltipOffset + 'px'
             return
           .on 'mouseout', ->
+            $scope.barChart.month = undefined
+            $scope.barChart.year = undefined
+            $scope.barChart.field = undefined
+            $scope.$apply()
+
             tooltip.style 'display', ''
             return
+
+          barPiece.append 'rect'
+          .attr 'x', -barGap / 2
+          .attr 'y', height - margin.bottom
+          .attr 'width', barWidth + barGap
+          .attr 'height', 0
+          .attr 'stroke', '#fff'
+          .attr 'stroke-width', if $scope.filters.field and $scope.filters.region then 1 else 0
+          .style 'fill', '#fff'
+          .transition()
+          .duration $scope.duration
+          .attr 'y', y - barHeight
+          .attr 'height', barHeight
+
+          barPiece.append 'rect'
+          .attr 'y', height - margin.bottom
+          .attr 'width', barWidth
+          .attr 'height', 0
+          .attr 'stroke', '#fff'
+          .attr 'stroke-width', if $scope.filters.field and $scope.filters.region then 1 else 0
+          .style 'fill', color
           .transition()
           .duration $scope.duration
           .attr 'y', y - barHeight
@@ -190,14 +215,12 @@ app.directive 'barChart', ->
 
         if tBm.overall
           bar.append 'text'
-          .classed 'caption', true
           .attr 'x', barWidth / 2
-          .attr 'y', height - margin.bottom - yScale(tBm.overall) - 10
+          .attr 'y', -10
           .text (tBm.overall / 1000000).toFixed(1)
-          .style 'opacity', 0
           .transition()
           .duration $scope.duration
-          .style 'opacity', 1
+          .attr 'y', height - margin.bottom - yScale(tBm.overall) - 10
         return
       return
 

@@ -2,22 +2,29 @@
 
 .map-tooltip {
   position: absolute;
-  padding: 5px;
+  display: none;
   background-color: rgba(255, 255, 255, .7);
   white-space: nowrap;
   text-align: left;
   font-family: $helvetica-neue-light;
   font-size: $small-font-size;
 
-  .region {
-    display: inline-block;
-    font-weight: bold;
+  .region-info {
+    padding: 5px;
+    .region {
+      display: inline-block;
+      font-weight: bold;
+    }
   }
 
-  .field {
-    display: inline-block;
-    text-transform: lowercase;
-    font-weight: normal;
+  .field-info {
+    margin-top: -5px;
+    padding: 0 5px 5px 5px;
+    .field {
+      display: inline-block;
+      text-transform: lowercase;
+      font-weight: normal;
+    }
   }
 
   .value {
@@ -34,7 +41,7 @@
       fill: #fff;
       text-shadow: 0 0 2px white;
     }
-    
+
     text {
       font-family: $helvetica-neue-light;
       cursor: default;
