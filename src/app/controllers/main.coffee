@@ -32,6 +32,8 @@ app.controller 'mainCtrl', ($scope) ->
     field: undefined
     prices: []
     price: undefined
+    types: []
+    type: undefined
     regions: []
     region: undefined
 
@@ -133,12 +135,14 @@ app.controller 'mainCtrl', ($scope) ->
     $scope.data.tenders = $scope.data.tenders.filter (t) -> _.has $scope.data.colors, t.field
 
     # Create filters
-    $scope.filters.fields = [{id: 0, name: 'Все индустрии'}]
+    $scope.filters.fields = [{id: 0, name: 'Все индустрии', style: 'background-color': '#fff'}]
 
-    _.uniq(_.pluck($scope.data.tenders, 'field')).sort().forEach (d, i) ->
-      $scope.filters.fields.push
-        id: i + 1
-        name: d
+    _.keys($scope.data.colors).forEach (key, i) ->
+      unless key is 'None'
+        $scope.filters.fields.push
+          id: i + 1
+          name: key
+          style: 'background-color': $scope.data.colors[key]
       return
 
     $scope.filters.prices = [
@@ -174,6 +178,14 @@ app.controller 'mainCtrl', ($scope) ->
       }
     ]
 
+    _.keys(tenderTypes).forEach (key, i) ->
+      $scope.filters.types.push
+        id: i
+        name: tenderTypes[key]
+        disabled: key isnt '4'
+        style: unless key is '4' then {'background-color': '#e6e6e6', 'color': '#333'}
+      return
+
     $scope.filters.regions = [{id: 0, name: 'Все регионы'}]
 
     _.uniq(_.pluck($scope.data.tenders, 'region')).sort().forEach (d, i) ->
@@ -184,6 +196,7 @@ app.controller 'mainCtrl', ($scope) ->
 
     $scope.filters.field = 0
     $scope.filters.price = 0
+    $scope.filters.type = 3
     $scope.filters.region = 0
 
     # Load map data
