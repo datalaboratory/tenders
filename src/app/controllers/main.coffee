@@ -178,17 +178,20 @@ app.controller 'mainCtrl', ($scope) ->
       }
     ]
 
-    _.keys(tenderTypes).forEach (key, i) ->
-      $scope.filters.types.push
-        id: i
-        name: tenderTypes[key]
-        disabled: key isnt '4'
-        style: unless key is '4' then {'background-color': '#e6e6e6', 'color': '#333'}
+    $scope.filters.types = [{id: 0, name: 'Электронный аукцион'}]
+
+    _.keys(_.invert(tenderTypes)).sort().forEach (key, i) ->
+      unless key is 'Электронный аукцион'
+        $scope.filters.types.push
+          id: i + 1
+          name: key
+          disabled: true
+          style: {'background-color': '#fff', 'color': '#e6e6e6'}
       return
 
     $scope.filters.regions = [{id: 0, name: 'Все регионы'}]
 
-    _.uniq(_.pluck($scope.data.tenders, 'region')).sort().forEach (d, i) ->
+    _.keys($scope.data.codes).sort().forEach (d, i) ->
       $scope.filters.regions.push
         id: i + 1
         name: d
@@ -196,7 +199,7 @@ app.controller 'mainCtrl', ($scope) ->
 
     $scope.filters.field = 0
     $scope.filters.price = 0
-    $scope.filters.type = 3
+    $scope.filters.type = 0
     $scope.filters.region = 0
 
     # Load map data
