@@ -30,50 +30,67 @@ app.directive 'map', ->
 
     path = d3.geo.path().projection projection
 
-    getFieldsInfo = (region) ->
-      code = region.properties.region
+    regionTenders = {}
+
+    _.keys(_.invert($scope.data.codes)).forEach (key) ->
+      regionTenders[key] = $scope.data.tenders.filter (t) -> t.code is key
+      return
+
+    getFieldsInfo = (code) ->
       fieldsInfo =
         best: 'None'
         bestValue: 0
         overall: 0
 
-      filteredTenders = $scope.data.tenders.filter (t) ->
-        (t.code is code) and
-        (if $scope.filters.field then t.field is $scope.filters.fields[$scope.filters.field].name else true) and
-        (if $scope.filters.price then $scope.filters.prices[$scope.filters.price].leftLimit <= t.price <= $scope.filters.prices[$scope.filters.price].rightLimit else true) and
-        (if $scope.filters.region then t.region is $scope.filters.regions[$scope.filters.region].name else true) and
-        (if $scope.barChart.field then t.field is $scope.barChart.field else true) and
-        (if $scope.barChart.month isnt undefined and $scope.barChart.year isnt undefined then moment(t.date).month() is $scope.barChart.month and moment(t.date).year() is $scope.barChart.year else true)
+      filteredTenders = regionTenders[code]
 
-      if filteredTenders.length
-        regionFields = []
+      if filteredTenders
+        filteredTenders = filteredTenders.filter (t) ->
+          (if $scope.filters.field then t.field is $scope.filters.fields[$scope.filters.field].name else true) and
+          (if $scope.filters.price then $scope.filters.prices[$scope.filters.price].leftLimit <= t.price <= $scope.filters.prices[$scope.filters.price].rightLimit else true) and
+          (if $scope.filters.region then t.region is $scope.filters.regions[$scope.filters.region].name else true) and
+          (if $scope.barChart.field then t.field is $scope.barChart.field else true) and
+          (if $scope.barChart.month isnt undefined and $scope.barChart.year isnt undefined then moment(t.date).month() is $scope.barChart.month and moment(t.date).year() is $scope.barChart.year else true)
 
-        _.uniq(_.pluck(filteredTenders, 'field')).forEach (d) ->
-          fieldTenders = filteredTenders.filter (fT) -> fT.field is d
-          regionFields.push
-            name: d
-            value: d3.sum _.pluck fieldTenders, 'price'
-          return
+        if filteredTenders.length
+          regionFields = []
 
-        fieldsInfo.best =  _.max(regionFields, 'value').name
-        fieldsInfo.bestValue = _.max(regionFields, 'value').value
-        fieldsInfo.overall = d3.sum _.pluck regionFields, 'value'
+          _.uniq(_.pluck(filteredTenders, 'field')).forEach (d) ->
+            fieldTenders = filteredTenders.filter (fT) -> fT.field is d
+            regionFields.push
+              name: d
+              value: d3.sum _.pluck fieldTenders, 'price'
+            return
+
+          fieldsInfo.best =  _.max(regionFields, 'value').name
+          fieldsInfo.bestValue = _.max(regionFields, 'value').value
+          fieldsInfo.overall = d3.sum _.pluck regionFields, 'value'
 
       fieldsInfo
 
     paintRegionsByBestField = ->
+      bestFields = {}
+
+      _.keys($scope.data.codes).forEach (key) ->
+        code = $scope.data.codes[key]
+        bestFields[code] = getFieldsInfo code
+        return
+
       regions
       .style 'fill', (d) ->
-        $scope.data.colors[getFieldsInfo(d).best]
+        if bestFields[d.properties.region]
+          $scope.data.colors[bestFields[d.properties.region].best]
+        else
+          $scope.data.colors['None']
       .style 'opacity', 1
       return
 
     paintRegionsBySelectedField = ->
       prices = {}
+
       _.keys($scope.data.codes).forEach (key) ->
         code = $scope.data.codes[key]
-        filteredTenders = $scope.data.tenders.filter (t) ->
-          (t.code is code) and
+        filteredTenders = regionTenders[code].filter (t) ->
           (if $scope.filters.field then t.field is $scope.filters.fields[$scope.filters.field].name else true) and
           (if $scope.filters.price then $scope.filters.prices[$scope.filters.price].leftLimit <= t.price <= $scope.filters.prices[$scope.filters.price].rightLimit else true) and
           (if $scope.filters.region then t.region is $scope.filters.regions[$scope.filters.region].name else true) and
@@ -132,7 +149,7 @@ app.directive 'map', ->
     .classed 'region', true
     .attr 'd', path
     .attr 'id', (d) -> d.properties.region
-    .style 'fill', (d) -> $scope.data.colors[getFieldsInfo(d).best]
+    .style 'fill', (d) -> $scope.data.colors[getFieldsInfo(d.properties.region).best]
     .style 'stroke', '#f1f1f1'
     .style 'stroke-width', .5
     .style 'opacity', 1
@@ -141,7 +158,7 @@ app.directive 'map', ->
         $scope.map.region = d.properties.region
       $scope.$apply()
 
-      fieldsInfo = getFieldsInfo d
+      fieldsInfo = getFieldsInfo d.properties.region
 
       tooltipRegionInfoRegion.html _.invert($scope.data.codes)[d.properties.region] + (if fieldsInfo.overall then ':' else '')
       tooltipRegionInfoValue.style('display', if fieldsInfo.overall then '' else 'none').html((fieldsInfo.overall / 1000000).toFixed(1) + ' млн')
